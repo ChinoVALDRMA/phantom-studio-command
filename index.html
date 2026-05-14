@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>PHANTO Content Command Center</title>
+    <!-- Fonts: Inter & JetBrains Mono -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <!-- Sidebar / Navigation -->
+      <aside id="sidebar" class="sidebar">
+        <div class="logo">
+          <h2>PHANTO</h2>
+          <span class="subtitle">COMMAND CENTER</span>
+        </div>
+        <nav>
+          <button id="btn-calendar" class="nav-btn active">Calendario</button>
+          <button id="btn-growth" class="nav-btn">Growth Tracker</button>
+          <button id="btn-ideas" class="nav-btn">Idea Bank</button>
+        </nav>
+        <div class="growth-widget">
+          <h4>Meta: TikTok Lives</h4>
+          <div class="progress-bar">
+            <div class="progress-fill" id="growth-progress" style="width: 0%"></div>
+          </div>
+          <div class="progress-text"><span id="follower-count">0</span> / 1,000 seguidores</div>
+        </div>
+        <div class="checklist">
+          <h4>Daily Engagement</h4>
+          <label><input type="checkbox"> Comentar 10 cuentas</label>
+          <label><input type="checkbox"> Responder comments</label>
+          <label><input type="checkbox"> 1 Duet / Stitch</label>
+        </div>
+      </aside>
+
+      <!-- Main Content Area -->
+      <main id="main-content" class="main-content">
+        <header class="top-nav">
+          <button id="prev-week" class="week-nav">← Ant.</button>
+          <h1 id="week-title">Semana Actual</h1>
+          <button id="next-week" class="week-nav">Sig. →</button>
+        </header>
+
+        <div id="calendar-grid" class="calendar-grid">
+          <!-- Days will be generated here -->
+        </div>
+
+        <div id="content-detail-modal" class="modal hidden">
+          <div class="modal-content">
+            <button id="close-modal" class="close-btn">×</button>
+            <div id="modal-body"></div>
+          </div>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

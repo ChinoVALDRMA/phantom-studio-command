@@ -1,0 +1,580 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<title>Phantom Studio Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-color: #0b0c10;
+  --bg-panel: #1f2833;
+  --text-primary: #ffffff;
+  --text-secondary: #c5c6c7;
+  --accent-cyan: #66fcf1;
+  --accent-cyan-dim: #45a29e;
+  --accent-magenta: #ff00ff;
+  --accent-amber: #ffb000;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(31, 40, 51, 0.6);
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 24px;
+}
+
+.logo h2 {
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+}
+
+.logo .subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+  font-family: var(--font-mono);
+}
+
+nav { display: flex; flex-direction: column; gap: 10px; }
+
+.nav-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-secondary);
+  padding: 12px 16px; text-align: left; font-family: var(--font-main);
+  font-size: 15px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+}
+
+.nav-btn:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+.nav-btn.active { background-color: rgba(102, 252, 241, 0.1); color: var(--accent-cyan); border: 1px solid rgba(102, 252, 241, 0.2); }
+
+.sidebar-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-section h4 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+.main-content { flex: 1; display: flex; flex-direction: column; padding: 32px; overflow-y: auto; }
+.view-section { display: none; }
+.view-section.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.week-nav { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-mono); font-size: 13px; }
+.week-nav:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-cyan); }
+h1.view-title { font-size: 28px; font-weight: 800; }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.day-card { background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+.day-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+.day-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+.day-name { font-weight: 800; font-size: 18px; color: var(--accent-cyan); }
+.day-time { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+
+.content-type { font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.hook-preview { font-style: italic; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tag { background: rgba(255, 255, 255, 0.08); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; }
+.tag.collab { background: rgba(255, 0, 255, 0.15); color: #ff99ff; border: 1px solid rgba(255, 0, 255, 0.2); }
+.tag.difficulty-advanced { color: #ff5555; }
+
+/* Growth Tracker View */
+.account-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+.account-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.account-info h3 { font-size: 18px; margin-bottom: 4px; }
+.account-info p { color: var(--text-secondary); font-family: var(--font-mono); font-size: 13px; }
+.account-stats { flex: 1; max-width: 400px; }
+.stat-bar-container { background: rgba(255,255,255,0.05); height: 10px; border-radius: 5px; margin: 8px 0; overflow: hidden; }
+.stat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta)); width: 0; transition: width 0.8s ease; }
+.stat-labels { display: flex; justify-content: space-between; font-size: 12px; font-family: var(--font-mono); }
+
+.btn-add-account { background: var(--accent-cyan); color: var(--bg-color); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+
+/* Idea Bank View */
+.idea-card { background: var(--glass-bg); border-left: 4px solid var(--accent-magenta); padding: 20px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.idea-content h4 { color: var(--accent-magenta); margin-bottom: 8px; }
+.btn-refresh-ideas { background: transparent; border: 1px solid var(--accent-magenta); color: var(--accent-magenta); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+/* Member Section */
+.member-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-top: 24px; }
+.member-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+.member-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-cyan); }
+.member-card.tilin::after { background: var(--accent-magenta); }
+.member-card.codex::after { background: #ff5555; }
+.member-card.ridd::after { background: var(--accent-amber); }
+.member-card.vytruz::after { background: #55ff55; }
+
+.member-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.member-avatar { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.member-info h3 { font-size: 20px; color: var(--text-primary); }
+.member-info p { color: var(--accent-cyan); font-size: 13px; font-weight: 600; }
+
+.member-topics { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; }
+.member-topics h5 { font-size: 12px; text-transform: uppercase; margin-bottom: 10px; color: var(--text-secondary); }
+.topic-tag { display: inline-block; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 15px; font-size: 12px; margin: 0 4px 4px 0; border: 1px solid rgba(255,255,255,0.1); }
+
+/* Modal */
+.modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s ease; }
+.modal.hidden { opacity: 0; pointer-events: none; }
+.modal-content { background: var(--bg-panel); width: 90%; max-width: 900px; max-height: 90vh; border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); overflow-y: auto; position: relative; padding: 40px; }
+.close-btn { position: absolute; top: 20px; right: 24px; background: transparent; border: none; color: var(--text-secondary); font-size: 32px; cursor: pointer; }
+.detail-section { margin-bottom: 28px; }
+.detail-section h3 { font-size: 18px; color: var(--accent-cyan); margin-bottom: 14px; border-bottom: 1px solid rgba(102, 252, 241, 0.15); padding-bottom: 10px; }
+.detail-section p, .detail-section ul { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+.detail-section ul { padding-left: 20px; list-style-type: square; }
+.script-box { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; font-family: var(--font-mono); font-size: 14px; white-space: pre-wrap; border: 1px solid var(--border-color); margin-top: 12px; color: var(--accent-cyan); }
+.hashtags-box { margin-top: 16px; color: var(--accent-magenta); font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--bg-panel); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan-dim); }
+</style>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="logo">
+        <h2>PHANTOM</h2>
+        <span class="subtitle">STUDIO COMMAND</span>
+      </div>
+      <nav>
+        <button id="nav-calendar" class="nav-btn active" data-view="calendar-view">📅 Calendario</button>
+        <button id="nav-growth" class="nav-btn" data-view="growth-view">📈 Growth Tracker</button>
+        <button id="nav-members" class="nav-btn" data-view="members-view">👥 Equipo PHANTO</button>
+        <button id="nav-ideas" class="nav-btn" data-view="ideas-view">💡 Banco de Ideas</button>
+      </nav>
+      
+      <div class="sidebar-section">
+        <h4>Meta Principal</h4>
+        <div class="growth-widget">
+          <div class="progress-bar"><div class="progress-fill" id="global-progress" style="width: 0%"></div></div>
+          <div class="progress-text"><span id="global-followers">0</span> / 1,000</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- CALENDAR VIEW -->
+      <section id="calendar-view" class="view-section active">
+        <header class="top-nav">
+          <button id="prev-week" class="week-nav">← Semana Anterior</button>
+          <h1 id="week-title" class="view-title">Semana Actual</h1>
+          <button id="next-week" class="week-nav">Siguiente Semana →</button>
+        </header>
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </section>
+
+      <!-- GROWTH VIEW -->
+      <section id="growth-view" class="view-section">
+        <h1 class="view-title">Growth Tracker Multi-Cuenta</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px;">Gestiona el crecimiento de todas las cuentas del equipo.</p>
+        <div id="account-list" class="account-list"></div>
+        <button id="add-account-btn" class="btn-add-account">+ Añadir Cuenta</button>
+      </section>
+
+      <!-- MEMBERS VIEW -->
+      <section id="members-view" class="view-section">
+        <h1 class="view-title">Estrategia Personalizada por Miembro</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px;">Temas y enfoques específicos basados en el perfil de cada artista.</p>
+        <div id="member-grid" class="member-grid"></div>
+      </section>
+
+      <!-- IDEAS VIEW -->
+      <section id="ideas-view" class="view-section">
+        <h1 class="view-title">Banco de Ideas Relámpago</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px; margin-bottom: 24px;">Genera ideas frescas cuando te sientas bloqueado.</p>
+        <div id="ideas-container"></div>
+        <button id="refresh-ideas-btn" class="btn-refresh-ideas" style="margin-top: 20px;">Generar Nuevas Ideas</button>
+      </section>
+
+      <!-- MODAL -->
+      <div id="content-detail-modal" class="modal hidden">
+        <div class="modal-content">
+          <button id="close-modal" class="close-btn">×</button>
+          <div id="modal-body"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+<script>
+// --- DATA pools ---
+const pillars = [
+  { id: 'p1', name: '🎛️ Studio Session', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#producerlife', '#studioflow', '#ableton', '#techhouse', '#beatmaking'] },
+  { id: 'p2', name: '🎹 Before/After Sound', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#sounddesign', '#mixing', '#musicproduction', '#beforeafter', '#audioprocessing'] },
+  { id: 'p3', name: '📚 Tutorial Rápido', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#productiontips', '#abletonhacks', '#musicproducer', '#tutorial', '#learnmusic'] },
+  { id: 'p4', name: '🎧 Track Preview', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#newmusic', '#upcomingrelease', '#phanto', '#afrohouse', '#snippet'] },
+  { id: 'p5', name: '🤝 Collab Session', type: 'Collab', difficulty: 'Medio', format: 'Short', hashtags: ['#collaboration', '#studiovibes', '#phantomteam', '#makingof', '#artists'] },
+  { id: 'p6', name: '😂 Humor de Productor', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#producermemes', '#relatable', '#studiolife', '#producerhumor', '#djproblems'] },
+  { id: 'p7', name: '💬 Storytelling', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#musicstory', '#behindthescenes', '#creativelife', '#inspiration', '#artistjourney'] },
+  { id: 'p8', name: '🧠 Psy/Lifestyle', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#lifestyle', '#psychology', '#mindset', '#creativeprocess', '#phantoidentity'] },
+  { id: 'p9', name: '🔥 Live Performance', type: 'Solo/Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#liveset', '#djset', '#performance', '#pioneer', '#pushlive'] },
+  { id: 'p10', name: '📸 Photo Mode', type: 'Solo', difficulty: 'Fácil', format: 'Carousel', hashtags: ['#studiophoto', '#gearporn', '#aesthetic', '#phantomstudio', '#musicgear'] },
+  { id: 'p11', name: '🎬 Deep Dive (YouTube)', type: 'Solo', difficulty: 'Difícil', format: 'Long', hashtags: ['#deepdive', '#youtube', '#longform', '#masterclass', '#producertalk'] },
+  { id: 'p12', name: '🎤 Freestyle/Jam', type: 'Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#freestyle', '#jamming', '#improvisation', '#livevocals', '#phantomvibes'] }
+];
+
+const hooks = {
+  curiosity: [
+    "No vas a creer cómo suena esto con un solo efecto...",
+    "El secreto que nadie te dice sobre los bajos en Tech House...",
+    "¿Qué pasa si mezclamos Cumbia con Afrohouse? Escucha esto...",
+    "POV: Encontraste EL sonido perfecto a las 3am...",
+    "El sample que me prohibieron usar pero que suena increíble..."
+  ],
+  comparison: [
+    "Esto tardó 5 minutos vs Esto tardó 5 horas",
+    "Plugin de $200 vs Plugin Gratis. ¿Notas la diferencia?",
+    "Mi primera producción vs Mi último track",
+    "Cómo sonaba mi demo vs Cómo suena el master final"
+  ],
+  challenge: [
+    "Intenta no mover la cabeza con este beat...",
+    "Solo el 1% de los productores identifica este sample...",
+    "A que no adivinas de dónde saqué este sonido...",
+    "¿Puedes reconocer este instrumento oculto en el mix?"
+  ],
+  educational: [
+    "El truco en Ableton que me ahorra horas...",
+    "Cómo hacer que tu bajo suene GORDO en 3 pasos...",
+    "Deja de usar reverb así. Haz esto en su lugar...",
+    "La cadena de efectos 'mágica' para mis voces..."
+  ],
+  story: [
+    "La historia de cómo este track casi nunca sale...",
+    "Estaba a punto de borrar este proyecto hasta que...",
+    "Cómo un mal día en el estudio terminó en mi mejor beat...",
+    "Lo que aprendí trabajando con este artista de la escena..."
+  ]
+};
+
+const talkingPoints = [
+  "Explica por qué elegiste este sonido específico.",
+  "Muestra tu cara de reacción al escuchar el drop.",
+  "Comenta qué problema estabas intentando resolver.",
+  "Haz una pregunta a la audiencia sobre su plugin favorito.",
+  "Menciona que este track será parte del próximo release de PHANTO.",
+  "Aclara que la simplicidad a veces es mejor que la complejidad."
+];
+
+const team = [
+  { id: 'chino', name: 'ElChinoVALDRM', role: 'Fundador / Productor / Conector', avatar: '👻', topics: ['Tech House Vibes', 'Piano & Sax en vivo', 'Visión de Phantom Studio', 'Estrategia de equipo'], color: 'tilin' },
+  { id: 'tilin', name: 'Tilin', role: 'Artista / Productor / Jazz Spirit', avatar: '🎷', topics: ['Jazz & Urbano Fusion', 'Psicodelia y buenas vibras', 'Exploración de guitarra', 'Estética y perforaciones'], color: 'tilin' },
+  { id: 'codex', name: 'Codex (Ian)', role: 'Productor / Cantante / Mechatronic', avatar: '🤖', topics: ['Reggaetón & Trap pesado', 'De Ecatepec para el mundo', 'Mecatrónica aplicada a la música', 'Freestyle crudo'], color: 'codex' },
+  { id: 'ridd', name: 'Ridd (Mau)', role: 'Cantante / Asesor Legal', avatar: '⚖️', topics: ['Derechos de autor para artistas', 'Entrenamiento vocal', 'Leyes vs Música', 'Urbano sentimental'], color: 'ridd' },
+  { id: 'vytruz', name: 'Vytruz (Allan)', role: 'Productor / DJ / Finance', avatar: '📉', topics: ['Gear Pro (Mac Studio, Serum)', 'Finanzas para músicos', 'Bass music detallado', 'Workflow de precisión'], color: 'vytruz' }
+];
+
+const effects = [
+  "Transición: Whip pan rápido",
+  "Toma: Close-up manos en Push/Teclado",
+  "Edición: Cortes rápidos al ritmo (Beat sync cut)",
+  "Efecto visual: Glitch en el drop",
+  "Toma: POV estilo primera persona produciendo",
+  "Efecto post: Color grading cálido/analógico (Film Noir)",
+  "Transición: Zoom punch agresivo",
+  "Toma: Timelapse del estudio organizándose",
+  "Efecto visual: Speed ramp (lento a rápido) justo antes del drop",
+  "Toma: Pantalla dividida (cara reaccionando + Ableton screen)"
+];
+
+// --- UTILS ---
+function createPRNG(seed) {
+  let state = seed % 2147483647;
+  if (state <= 0) state += 2147483646;
+  return function() {
+    state = (state * 16807) % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+}
+
+function getRandomFrom(arr, prng) { return arr[Math.floor(prng() * arr.length)]; }
+
+function shuffle(array, prng) {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(prng() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+// --- GENERATOR V2 ---
+function generateWeek(year, weekNumber) {
+  const seed = year * 1000 + weekNumber;
+  const prng = createPRNG(seed);
+  const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  
+  // Ensure variety: shuffle pillars and pick first 7
+  const availablePillars = shuffle([...pillars], prng);
+  const weekData = [];
+
+  daysOfWeek.forEach((dayName, index) => {
+    const pillar = availablePillars[index % availablePillars.length];
+    const categoryKeys = Object.keys(hooks);
+    const hook = getRandomFrom(hooks[getRandomFrom(categoryKeys, prng)], prng);
+    const effect = getRandomFrom(effects, prng);
+    const points = shuffle([...talkingPoints], prng).slice(0, 2);
+    
+    let collabData = null;
+    if (pillar.type === 'Collab' || pillar.id === 'p9' || pillar.id === 'p12') {
+      const otherMembers = team.filter(m => m.id !== 'chino');
+      const partner = getRandomFrom(otherMembers, prng);
+      collabData = { person: partner.name, topic: getRandomFrom(partner.topics, prng) };
+    }
+
+    weekData.push({
+      dayName,
+      pillar,
+      hook,
+      effect,
+      talkingPoints: points,
+      collabData,
+      time: (index < 5) ? '18:00 - 21:00' : '11:00 - 15:00',
+      tags: [pillar.type, pillar.difficulty, pillar.format],
+      hashtags: pillar.hashtags
+    });
+  });
+  return weekData;
+}
+
+// --- UI Rendering ---
+function renderCalendar(weekData) {
+  const container = document.getElementById('calendar-grid');
+  container.innerHTML = '';
+  weekData.forEach(day => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    const tagsHtml = day.tags.map(tag => `<span class="tag ${tag.includes('Collab') ? 'collab' : ''} ${tag === 'Difícil' ? 'difficulty-advanced' : ''}">${tag}</span>`).join('');
+    
+    card.innerHTML = `
+      <div class="day-header"><span class="day-name">${day.dayName}</span><span class="day-time">${day.time}</span></div>
+      <div class="content-type">${day.pillar.name}</div>
+      <div class="hook-preview">"${day.hook}"</div>
+      <div class="tags">${tagsHtml}</div>
+    `;
+    card.onclick = () => openModal(day);
+    container.appendChild(card);
+  });
+}
+
+function openModal(day) {
+  const modal = document.getElementById('content-detail-modal');
+  const body = document.getElementById('modal-body');
+  
+  let collabHtml = day.collabData ? `
+    <div class="detail-section">
+      <h3>🤝 Colaboración con ${day.collabData.person}</h3>
+      <p><strong>Enfoque:</strong> ${day.collabData.topic}</p>
+    </div>` : '';
+
+  body.innerHTML = `
+    <h2 style="margin-bottom: 24px; font-size: 24px; color: var(--accent-cyan);">${day.dayName} — ${day.pillar.name}</h2>
+    <div class="detail-section"><h3>🎣 Gancho (Hook)</h3><p style="font-size: 18px; font-weight: 600;">"${day.hook}"</p></div>
+    ${collabHtml}
+    <div class="detail-section">
+      <h3>🗣️ Qué decir (Talking Points)</h3>
+      <ul>${day.talkingPoints.map(p => `<li>${p}</li>`).join('')}</ul>
+    </div>
+    <div class="detail-section">
+      <h3>🎬 Guión & Estética</h3>
+      <div class="script-box">
+        1. START: Hook visual y verbal.
+        2. MID: ${day.effect}. Mostrar proceso.
+        3. END: Resultado sonoro + CTA a seguir a PHANTO.
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>🏷️ Hashtags recomendados</h3>
+      <div class="hashtags-box">${day.hashtags.join(' ')} #phanto #elchino</div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+function renderGrowthTracker() {
+  const container = document.getElementById('account-list');
+  const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+  container.innerHTML = accounts.length ? '' : '<p style="color: var(--text-secondary);">No hay cuentas añadidas.</p>';
+  
+  let totalFollowers = 0;
+  accounts.forEach((acc, i) => {
+    totalFollowers += parseInt(acc.followers);
+    const progress = Math.min((acc.followers / acc.goal) * 100, 100);
+    const card = document.createElement('div');
+    card.className = 'account-card';
+    card.innerHTML = `
+      <div class="account-info"><h3>${acc.name}</h3><p>@${acc.handle}</p></div>
+      <div class="account-stats">
+        <div class="stat-labels"><span>${acc.followers} seg.</span><span>Meta: ${acc.goal}</span></div>
+        <div class="stat-bar-container"><div class="stat-bar-fill" style="width: ${progress}%"></div></div>
+      </div>
+      <button onclick="deleteAccount(${i})" style="background:transparent; border:none; color: #ff5555; cursor:pointer; font-size: 20px;">×</button>
+    `;
+    container.appendChild(card);
+  });
+  
+  document.getElementById('global-followers').innerText = totalFollowers;
+  document.getElementById('global-progress').style.width = `${Math.min((totalFollowers/1000)*100, 100)}%`;
+}
+
+function renderMemberStrategies() {
+  const container = document.getElementById('member-grid');
+  container.innerHTML = '';
+  
+  // Use current week for seeded randomness
+  const date = new Date();
+  const weekSeed = date.getFullYear() * 100 + Math.ceil(date.getDate() / 7);
+  const prng = createPRNG(weekSeed);
+
+  team.forEach(m => {
+    const card = document.createElement('div');
+    card.className = `member-card ${m.color}`;
+    
+    // Generate a weekly focus based on their specific topics
+    const weeklyFocus = shuffle([...m.topics], prng)[0];
+    const secondaryFocus = shuffle([...m.topics], prng)[1];
+
+    card.innerHTML = `
+      <div class="member-header">
+        <div class="member-avatar">${m.avatar}</div>
+        <div class="member-info"><h3>${m.name}</h3><p>${m.role}</p></div>
+      </div>
+      <div class="member-topics">
+        <h5>Misión Semanal (Personalizada)</h5>
+        <div style="background: rgba(102, 252, 241, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid var(--accent-cyan);">
+           <strong>Tema Central:</strong> ${weeklyFocus}
+        </div>
+        
+        <h5>Tus Pilares de Contenido</h5>
+        ${m.topics.map(t => `<span class="topic-tag">${t}</span>`).join('')}
+        
+        <div style="margin-top: 15px; font-size: 13px; color: var(--text-secondary);">
+          <strong>Tip del Comandante:</strong> Esta semana, haz un video corto hablando sobre <em>"${secondaryFocus}"</em>. Usa un tono que conecte con tu audiencia.
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <h5 style="font-size: 10px; color: var(--accent-magenta);">Sugerencia de Hook Personalizado:</h5>
+          <p style="font-size: 13px; font-style: italic;">"${getRandomFrom(Object.values(hooks).flat(), prng)}"</p>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderIdeas() {
+  const container = document.getElementById('ideas-container');
+  container.innerHTML = '';
+  const prng = createPRNG(Date.now());
+  for(let i=0; i<3; i++) {
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+    card.innerHTML = `
+      <div class="idea-content">
+        <h4>Idea #${i+1}</h4>
+        <p>"${getRandomFrom(Object.values(hooks).flat(), prng)}" usando "${getRandomFrom(effects, prng)}"</p>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+// --- STATE & EVENTS ---
+let currentWeekOffset = 0;
+
+function switchView(viewId) {
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(viewId).classList.add('active');
+  document.querySelector(`[data-view="${viewId}"]`).classList.add('active');
+}
+
+function addAccount() {
+  const name = prompt("Nombre de la cuenta:");
+  const handle = prompt("Handle (ej: elchino_phanto):");
+  const followers = prompt("Seguidores actuales:");
+  const goal = prompt("Meta de seguidores:");
+  if(name && handle && followers && goal) {
+    const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+    accounts.push({ name, handle, followers: parseInt(followers), goal: parseInt(goal) });
+    localStorage.setItem('phanto_accounts', JSON.stringify(accounts));
+    renderGrowthTracker();
+  }
+}
+
+function deleteAccount(index) {
+  const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+  accounts.splice(index, 1);
+  localStorage.setItem('phanto_accounts', JSON.stringify(accounts));
+  renderGrowthTracker();
+}
+
+function init() {
+  loadWeek(0);
+  renderGrowthTracker();
+  renderMemberStrategies();
+  renderIdeas();
+  
+  // Nav events
+  document.querySelectorAll('.nav-btn').forEach(btn => {
+    btn.onclick = () => switchView(btn.dataset.view);
+  });
+  
+  document.getElementById('prev-week').onclick = () => { currentWeekOffset--; loadWeek(currentWeekOffset); };
+  document.getElementById('next-week').onclick = () => { currentWeekOffset++; loadWeek(currentWeekOffset); };
+  document.getElementById('close-modal').onclick = () => document.getElementById('content-detail-modal').classList.add('hidden');
+  document.getElementById('add-account-btn').onclick = addAccount;
+  document.getElementById('refresh-ideas-btn').onclick = renderIdeas;
+  
+  window.onclick = (e) => { if(e.target.id === 'content-detail-modal') e.target.classList.add('hidden'); };
+}
+
+function loadWeek(offset) {
+  const date = new Date();
+  date.setDate(date.getDate() + (offset * 7));
+  const startDate = new Date(date.getFullYear(), 0, 1);
+  const weekNumber = Math.ceil((((date - startDate) / 86400000) + startDate.getDay() + 1) / 7);
+  document.getElementById('week-title').innerText = `Semana ${weekNumber}, ${date.getFullYear()}` + (offset === 0 ? ' (Actual)' : '');
+  renderCalendar(generateWeek(date.getFullYear(), weekNumber));
+}
+
+init();
+</script>
+</body>
+</html>

@@ -1,0 +1,76 @@
+[debug] [2026-05-14T21:48:20.489Z] ----------------------------------------------------------------------
+[debug] [2026-05-14T21:48:20.491Z] Command:       /usr/local/bin/node /Users/jorgevalderramajimenez/.npm/_npx/7750544ccf494d8b/node_modules/.bin/firebase deploy --project phantom-studio-mx
+[debug] [2026-05-14T21:48:20.491Z] CLI Version:   15.18.0
+[debug] [2026-05-14T21:48:20.491Z] Platform:      darwin
+[debug] [2026-05-14T21:48:20.491Z] Node Version:  v24.15.0
+[debug] [2026-05-14T21:48:20.491Z] Time:          Thu May 14 2026 15:48:20 GMT-0600 (Central Standard Time)
+[debug] [2026-05-14T21:48:20.491Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-14T21:48:21.346Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-14T21:48:21.347Z] > authorizing via signed-in user (jorgegaelvj@gmail.com)
+[debug] [2026-05-14T21:48:21.347Z] [iam] checking project phantom-studio-mx for permissions ["firebase.projects.get","firebasehosting.sites.update"]
+[debug] [2026-05-14T21:48:21.347Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:48:21.347Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:48:21.348Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects/phantom-studio-mx:testIamPermissions [none]
+[debug] [2026-05-14T21:48:21.348Z] >>> [apiv2][(partial)header] POST https://cloudresourcemanager.googleapis.com/v1/projects/phantom-studio-mx:testIamPermissions  x-goog-user-project=phantom-studio-mx
+[debug] [2026-05-14T21:48:21.348Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/phantom-studio-mx:testIamPermissions {"permissions":["firebase.projects.get","firebasehosting.sites.update"]}
+[debug] [2026-05-14T21:48:22.420Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects/phantom-studio-mx:testIamPermissions 400
+[debug] [2026-05-14T21:48:22.420Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects/phantom-studio-mx:testIamPermissions {"error":{"code":400,"message":"Project 'projects/phantom-studio-mx' not found or deleted.","status":"INVALID_ARGUMENT","details":[{"@type":"type.googleapis.com/google.rpc.ErrorInfo","reason":"USER_PROJECT_DENIED","domain":"googleapis.com","metadata":{"containerInfo":"projects/phantom-studio-mx","service":"cloudresourcemanager.googleapis.com","consumer":"projects/phantom-studio-mx"}}]}}
+[debug] [2026-05-14T21:48:22.421Z] [iam] error while checking permissions, command may fail: Request to https://cloudresourcemanager.googleapis.com/v1/projects/phantom-studio-mx:testIamPermissions had HTTP Error: 400, Project 'projects/phantom-studio-mx' not found or deleted.
+[debug] [2026-05-14T21:48:22.421Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:48:22.421Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:48:22.421Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects/phantom-studio-mx [none]
+[debug] [2026-05-14T21:48:23.267Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects/phantom-studio-mx 403
+[debug] [2026-05-14T21:48:23.267Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects/phantom-studio-mx {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2026-05-14T21:48:23.267Z] Request to https://firebase.googleapis.com/v1beta1/projects/phantom-studio-mx had HTTP Error: 403, The caller does not have permission
+[debug] [2026-05-14T21:48:23.512Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/phantom-studio-mx had HTTP Error: 403, The caller does not have permission
+    at responseToError (/Users/jorgevalderramajimenez/.npm/_npx/7750544ccf494d8b/node_modules/firebase-tools/lib/responseToError.js:53:12)
+    at RetryOperation._fn (/Users/jorgevalderramajimenez/.npm/_npx/7750544ccf494d8b/node_modules/firebase-tools/lib/apiv2.js:333:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to get Firebase project phantom-studio-mx. Please make sure the project exists and your account has permission to access it.
+[debug] [2026-05-14T21:49:01.926Z] ----------------------------------------------------------------------
+[debug] [2026-05-14T21:49:01.928Z] Command:       /usr/local/bin/node /Users/jorgevalderramajimenez/.npm/_npx/7750544ccf494d8b/node_modules/.bin/firebase projects:create phantom-studio-chino
+[debug] [2026-05-14T21:49:01.929Z] CLI Version:   15.18.0
+[debug] [2026-05-14T21:49:01.929Z] Platform:      darwin
+[debug] [2026-05-14T21:49:01.929Z] Node Version:  v24.15.0
+[debug] [2026-05-14T21:49:01.929Z] Time:          Thu May 14 2026 15:49:01 GMT-0600 (Central Standard Time)
+[debug] [2026-05-14T21:49:01.929Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2026-05-14T21:49:02.026Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2026-05-14T21:49:02.026Z] > authorizing via signed-in user (jorgegaelvj@gmail.com)
+[debug] [2026-05-14T21:51:30.625Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:30.626Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:30.626Z] >>> [apiv2][query] POST https://cloudresourcemanager.googleapis.com/v1/projects [none]
+[debug] [2026-05-14T21:51:30.626Z] >>> [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects {"projectId":"phantom-studio-chino","name":"phantom-studio-chino"}
+[debug] [2026-05-14T21:51:31.299Z] <<< [apiv2][status] POST https://cloudresourcemanager.googleapis.com/v1/projects 200
+[debug] [2026-05-14T21:51:31.299Z] <<< [apiv2][body] POST https://cloudresourcemanager.googleapis.com/v1/projects {"name":"operations/create_project.global.9143949309847145493"}
+[debug] [2026-05-14T21:51:31.299Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:31.300Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:31.300Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 [none]
+[debug] [2026-05-14T21:51:31.611Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 200
+[debug] [2026-05-14T21:51:31.612Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 {"name":"operations/create_project.global.9143949309847145493"}
+[debug] [2026-05-14T21:51:32.113Z] [Project Creation Poller] Retrying task index 0
+[debug] [2026-05-14T21:51:32.114Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:32.114Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:32.114Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 [none]
+[debug] [2026-05-14T21:51:32.275Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 200
+[debug] [2026-05-14T21:51:32.275Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 {"name":"operations/create_project.global.9143949309847145493"}
+[debug] [2026-05-14T21:51:33.277Z] [Project Creation Poller] Retrying task index 0
+[debug] [2026-05-14T21:51:33.278Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:33.278Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:33.278Z] >>> [apiv2][query] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 [none]
+[debug] [2026-05-14T21:51:33.505Z] <<< [apiv2][status] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 200
+[debug] [2026-05-14T21:51:33.505Z] <<< [apiv2][body] GET https://cloudresourcemanager.googleapis.com/v1/operations/create_project.global.9143949309847145493 {"name":"operations/create_project.global.9143949309847145493","metadata":{"@type":"type.googleapis.com/google.cloudresourcemanager.v1.ProjectCreationStatus","gettable":true,"ready":true},"done":true,"response":{"@type":"type.googleapis.com/google.cloudresourcemanager.v1.Project","projectNumber":"34121588854","projectId":"phantom-studio-chino","lifecycleState":"ACTIVE","name":"phantom-studio-chino","createTime":"2026-05-14T21:51:31.162Z"}}
+[debug] [2026-05-14T21:51:33.506Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:33.506Z] Checked if tokens are valid: true, expires at: 1778798731028
+[debug] [2026-05-14T21:51:33.506Z] >>> [apiv2][query] POST https://firebase.googleapis.com/v1beta1/projects/phantom-studio-chino:addFirebase [none]
+[debug] [2026-05-14T21:51:34.369Z] <<< [apiv2][status] POST https://firebase.googleapis.com/v1beta1/projects/phantom-studio-chino:addFirebase 403
+[debug] [2026-05-14T21:51:34.369Z] <<< [apiv2][body] POST https://firebase.googleapis.com/v1beta1/projects/phantom-studio-chino:addFirebase {"error":{"code":403,"message":"The caller does not have permission","status":"PERMISSION_DENIED"}}
+[debug] [2026-05-14T21:51:34.371Z] Request to https://firebase.googleapis.com/v1beta1/projects/phantom-studio-chino:addFirebase had HTTP Error: 403, The caller does not have permission
+[debug] [2026-05-14T21:51:34.638Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects/phantom-studio-chino:addFirebase had HTTP Error: 403, The caller does not have permission
+    at responseToError (/Users/jorgevalderramajimenez/.npm/_npx/7750544ccf494d8b/node_modules/firebase-tools/lib/responseToError.js:53:12)
+    at RetryOperation._fn (/Users/jorgevalderramajimenez/.npm/_npx/7750544ccf494d8b/node_modules/firebase-tools/lib/apiv2.js:333:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:104:5)
+[error] 
+[error] Error: Failed to add Firebase to Google Cloud Platform project. See firebase-debug.log for more info.
