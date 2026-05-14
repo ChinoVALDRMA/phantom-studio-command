@@ -48,7 +48,6 @@ body {
 }
 
 .logo h2 {
-  font-size: 28px;
   font-weight: 800;
   letter-spacing: 2px;
   background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
@@ -363,11 +362,11 @@ const talkingPoints = [
 ];
 
 const team = [
-  { id: 'chino', name: 'ElChinoVALDRM', role: 'Fundador / Productor / Conector', avatar: '👻', topics: ['Tech House Vibes', 'Piano & Sax en vivo', 'Visión de Phantom Studio', 'Estrategia de equipo'], color: 'tilin' },
-  { id: 'tilin', name: 'Tilin', role: 'Artista / Productor / Jazz Spirit', avatar: '🎷', topics: ['Jazz & Urbano Fusion', 'Psicodelia y buenas vibras', 'Exploración de guitarra', 'Estética y perforaciones'], color: 'tilin' },
-  { id: 'codex', name: 'Codex (Ian)', role: 'Productor / Cantante / Mechatronic', avatar: '🤖', topics: ['Reggaetón & Trap pesado', 'De Ecatepec para el mundo', 'Mecatrónica aplicada a la música', 'Freestyle crudo'], color: 'codex' },
-  { id: 'ridd', name: 'Ridd (Mau)', role: 'Cantante / Asesor Legal', avatar: '⚖️', topics: ['Derechos de autor para artistas', 'Entrenamiento vocal', 'Leyes vs Música', 'Urbano sentimental'], color: 'ridd' },
-  { id: 'vytruz', name: 'Vytruz (Allan)', role: 'Productor / DJ / Finance', avatar: '📉', topics: ['Gear Pro (Mac Studio, Serum)', 'Finanzas para músicos', 'Bass music detallado', 'Workflow de precisión'], color: 'vytruz' }
+  { id: 'chino', name: 'ElChinoVALDRM', role: 'Fundador / Productor / Multi-instrumentalist', avatar: '👻', topics: ['Tech House Vibes con Piano/Sax', 'Estrategia de crecimiento Phanto', 'Live performance setup', 'Conectando talento musical'], color: 'tilin' },
+  { id: 'tilin', name: 'Tilin', role: 'Artista / Jazz Spirit', avatar: '🎷', topics: ['Jazz & Urbano Fusion', 'Exploración psicodélica con guitarra', 'Estética única y perforaciones', 'Vibras de estudio y motivación'], color: 'tilin' },
+  { id: 'codex', name: 'Codex (Ian)', role: 'Productor / Mechatronic Artist', avatar: '🤖', topics: ['Beats de Ecatepec para el mundo', 'Ingeniería Mecatrónica aplicada al sonido', 'Reggaetón, Trap & Guaracha crossover', 'Freestyle y rimas crudas'], color: 'codex' },
+  { id: 'ridd', name: 'Ridd (Mau)', role: 'Cantante / Asesor Legal', avatar: '⚖️', topics: ['Derechos de autor para productores', 'Voz urbana con sentimiento', 'Leyes vs Realidad de la industria', 'Entrenamiento vocal desde cero'], color: 'ridd' },
+  { id: 'vytruz', name: 'Vytruz (Allan)', role: 'Productor Pro / Finance Expert', avatar: '📉', topics: ['Workflow de Mac Studio & Shure SM7B', 'Finanzas y ahorro para músicos', 'Bass music de alta precisión', 'Uso avanzado de Serum & Splice'], color: 'vytruz' }
 ];
 
 const effects = [
@@ -459,7 +458,7 @@ function renderCalendar(weekData) {
       <div class="hook-preview">"${day.hook}"</div>
       <div class="tags">${tagsHtml}</div>
     `;
-    card.onclick = () => openModal(day);
+    card.addEventListener('click', () => openModal(day));
     container.appendChild(card);
   });
 }
@@ -492,7 +491,7 @@ function openModal(day) {
     </div>
     <div class="detail-section">
       <h3>🏷️ Hashtags recomendados</h3>
-      <div class="hashtags-box">${day.hashtags.join(' ')} #phanto #elchino</div>
+      <div class="hashtags-box">${day.hashtags.join(' ')} #phantomstudio #elchino</div>
     </div>
   `;
   modal.classList.remove('hidden');
@@ -624,7 +623,10 @@ function init() {
   
   // Nav events
   document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.onclick = () => switchView(btn.dataset.view);
+    btn.addEventListener('click', (e) => {
+      e.preventDefault();
+      switchView(btn.dataset.view);
+    });
   });
   
   document.getElementById('prev-week').onclick = () => { currentWeekOffset--; loadWeek(currentWeekOffset); };
