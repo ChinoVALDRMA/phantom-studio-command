@@ -1,64 +1,715 @@
 <!DOCTYPE html>
 <html lang="es">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>👻</text></svg>" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>PHANTO Content Command Center</title>
-    <!-- Fonts: Inter & JetBrains Mono -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="/src/style.css" />
-  </head>
-  <body>
-    <div id="app">
-      <!-- Sidebar / Navigation -->
-      <aside id="sidebar" class="sidebar">
-        <div class="logo">
-          <h2>PHANTO</h2>
-          <span class="subtitle">COMMAND CENTER</span>
-        </div>
-        <nav>
-          <button id="btn-calendar" class="nav-btn active">Calendario</button>
-          <button id="btn-growth" class="nav-btn">Growth Tracker</button>
-          <button id="btn-ideas" class="nav-btn">Idea Bank</button>
-        </nav>
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Phantom Studio Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-color: #0b0c10;
+  --bg-panel: #1f2833;
+  --text-primary: #ffffff;
+  --text-secondary: #c5c6c7;
+  --accent-cyan: #66fcf1;
+  --accent-cyan-dim: #45a29e;
+  --accent-magenta: #ff00ff;
+  --accent-amber: #ffb000;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(31, 40, 51, 0.6);
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 24px;
+}
+
+.logo h2 {
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+}
+
+.logo .subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+  font-family: var(--font-mono);
+}
+
+nav { display: flex; flex-direction: column; gap: 10px; }
+
+.nav-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-secondary);
+  padding: 12px 16px; text-align: left; font-family: var(--font-main);
+  font-size: 15px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+}
+
+.nav-btn:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+.nav-btn.active { background-color: rgba(102, 252, 241, 0.1); color: var(--accent-cyan); border: 1px solid rgba(102, 252, 241, 0.2); }
+
+.sidebar-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-section h4 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+.main-content { flex: 1; display: flex; flex-direction: column; padding: 32px; overflow-y: auto; }
+.view-section { display: none; }
+.view-section.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; }
+.week-nav { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-mono); font-size: 13px; }
+.week-nav:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-cyan); }
+h1.view-title { font-size: 28px; font-weight: 800; }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.day-card { background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+.day-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+.day-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+.day-name { font-weight: 800; font-size: 18px; color: var(--accent-cyan); }
+.day-time { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+
+.content-type { font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.hook-preview { font-style: italic; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tag { background: rgba(255, 255, 255, 0.08); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; }
+.tag.collab { background: rgba(255, 0, 255, 0.15); color: #ff99ff; border: 1px solid rgba(255, 0, 255, 0.2); }
+.tag.hashtag { background: rgba(102, 252, 241, 0.1); color: var(--accent-cyan); border: 1px solid rgba(102, 252, 241, 0.2); font-weight: bold; text-transform: lowercase;}
+
+/* Growth Tracker View */
+.account-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+.account-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.account-info h3 { font-size: 18px; margin-bottom: 4px; }
+.account-info p { color: var(--text-secondary); font-family: var(--font-mono); font-size: 13px; }
+.account-stats { flex: 1; max-width: 400px; }
+.stat-bar-container { background: rgba(255,255,255,0.05); height: 10px; border-radius: 5px; margin: 8px 0; overflow: hidden; }
+.stat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta)); width: 0; transition: width 0.8s ease; }
+.stat-labels { display: flex; justify-content: space-between; font-size: 12px; font-family: var(--font-mono); }
+
+.btn-add-account { background: var(--accent-cyan); color: var(--bg-color); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+
+/* Idea Bank View */
+.idea-card { background: var(--glass-bg); border-left: 4px solid var(--accent-magenta); padding: 20px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; }
+.idea-content h4 { color: var(--accent-magenta); margin-bottom: 8px; }
+.btn-refresh-ideas { background: transparent; border: 1px solid var(--accent-magenta); color: var(--accent-magenta); padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: 600; }
+
+/* Member Section */
+.member-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-top: 24px; }
+.member-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+.member-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-cyan); }
+.member-card.tilin::after { background: var(--accent-magenta); }
+.member-card.codex::after { background: #ff5555; }
+.member-card.ridd::after { background: var(--accent-amber); }
+.member-card.vytruz::after { background: #55ff55; }
+
+.member-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.member-avatar { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+.member-info h3 { font-size: 20px; color: var(--text-primary); }
+.member-info p { color: var(--accent-cyan); font-size: 13px; font-weight: 600; }
+
+.member-topics { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; }
+.member-topics h5 { font-size: 12px; text-transform: uppercase; margin-bottom: 10px; color: var(--text-secondary); }
+.topic-tag { display: inline-block; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 15px; font-size: 12px; margin: 0 4px 4px 0; border: 1px solid rgba(255,255,255,0.1); }
+
+/* Modal */
+.modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s ease; }
+.modal.hidden { opacity: 0; pointer-events: none; }
+.modal-content { background: var(--bg-panel); width: 90%; max-width: 900px; max-height: 90vh; border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); overflow-y: auto; position: relative; padding: 40px; }
+.close-btn { position: absolute; top: 20px; right: 24px; background: transparent; border: none; color: var(--text-secondary); font-size: 32px; cursor: pointer; }
+.detail-section { margin-bottom: 28px; }
+.detail-section h3 { font-size: 18px; color: var(--accent-cyan); margin-bottom: 14px; border-bottom: 1px solid rgba(102, 252, 241, 0.15); padding-bottom: 10px; }
+.detail-section p, .detail-section ul { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
+.detail-section ul { padding-left: 20px; list-style-type: square; margin-top: 10px; }
+.script-box { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; font-family: var(--font-mono); font-size: 14px; white-space: pre-wrap; border: 1px solid var(--border-color); margin-top: 12px; color: var(--accent-cyan); }
+.hashtags-box { margin-top: 16px; color: var(--accent-magenta); font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
+
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: var(--bg-color); }
+::-webkit-scrollbar-thumb { background: var(--bg-panel); border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan-dim); }
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    overflow-y: auto;
+    height: auto;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    padding: 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(31, 40, 51, 0.95);
+    backdrop-filter: blur(15px);
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  
+  .logo h2 { font-size: 20px; }
+  .logo .subtitle { display: none; }
+  
+  nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .nav-btn {
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-section { display: none; }
+  
+  .main-content {
+    padding: 20px;
+    overflow-y: visible;
+  }
+  
+  .top-nav {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .view-title { font-size: 22px; }
+  
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    width: 95%;
+    padding: 24px;
+  }
+}
+</style>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="logo">
+        <h2>PHANTOM</h2>
+        <span class="subtitle">STUDIO COMMAND</span>
+      </div>
+      <nav>
+        <button class="nav-btn active" onclick="switchView('calendar-view', this)">📅 Calendario</button>
+        <button class="nav-btn" onclick="switchView('growth-view', this)">📈 Growth Tracker</button>
+        <button class="nav-btn" onclick="switchView('members-view', this)">👥 Equipo Phantom</button>
+        <button class="nav-btn" onclick="switchView('ideas-view', this)">💡 Banco de Ideas</button>
+      </nav>
+      
+      <div class="sidebar-section">
+        <h4>Meta Principal</h4>
         <div class="growth-widget">
-          <h4>Meta: TikTok Lives</h4>
-          <div class="progress-bar">
-            <div class="progress-fill" id="growth-progress" style="width: 0%"></div>
-          </div>
-          <div class="progress-text"><span id="follower-count">0</span> / 1,000 seguidores</div>
+          <div class="progress-bar"><div class="progress-fill" id="global-progress" style="width: 0%"></div></div>
+          <div class="progress-text"><span id="global-followers">0</span> / 1,000</div>
         </div>
-        <div class="checklist">
-          <h4>Daily Engagement</h4>
-          <label><input type="checkbox"> Comentar 10 cuentas</label>
-          <label><input type="checkbox"> Responder comments</label>
-          <label><input type="checkbox"> 1 Duet / Stitch</label>
-        </div>
-      </aside>
+      </div>
+    </aside>
 
-      <!-- Main Content Area -->
-      <main id="main-content" class="main-content">
+    <main class="main-content">
+      <!-- CALENDAR VIEW -->
+      <section id="calendar-view" class="view-section active">
         <header class="top-nav">
-          <button id="prev-week" class="week-nav">← Ant.</button>
-          <h1 id="week-title">Semana Actual</h1>
-          <button id="next-week" class="week-nav">Sig. →</button>
+          <button id="prev-week" class="week-nav" onclick="changeWeek(-1)">← Semana Anterior</button>
+          <h1 id="week-title" class="view-title">Semana Actual</h1>
+          <button id="next-week" class="week-nav" onclick="changeWeek(1)">Siguiente Semana →</button>
         </header>
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </section>
 
-        <div id="calendar-grid" class="calendar-grid">
-          <!-- Days will be generated here -->
-        </div>
+      <!-- GROWTH VIEW -->
+      <section id="growth-view" class="view-section">
+        <h1 class="view-title">Growth Tracker Multi-Cuenta</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px;">Gestiona el crecimiento de todas las cuentas del equipo.</p>
+        <div id="account-list" class="account-list"></div>
+        <button id="add-account-btn" class="btn-add-account" onclick="addAccount()">+ Añadir Cuenta</button>
+      </section>
 
-        <div id="content-detail-modal" class="modal hidden">
-          <div class="modal-content">
-            <button id="close-modal" class="close-btn">×</button>
-            <div id="modal-body"></div>
-          </div>
+      <!-- MEMBERS VIEW -->
+      <section id="members-view" class="view-section">
+        <h1 class="view-title">Estrategia Operativa por Artista</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px;">Asignaciones semanales basadas en las habilidades y el perfil de cada integrante.</p>
+        <div id="member-grid" class="member-grid"></div>
+      </section>
+
+      <!-- IDEAS VIEW -->
+      <section id="ideas-view" class="view-section">
+        <h1 class="view-title">Banco de Ideas Relámpago</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px; margin-bottom: 24px;">Genera hooks y conceptos rápidos cuando te sientas bloqueado.</p>
+        <div id="ideas-container"></div>
+        <button id="refresh-ideas-btn" class="btn-refresh-ideas" onclick="renderIdeas()" style="margin-top: 20px;">Generar Nuevas Ideas</button>
+      </section>
+
+      <!-- MODAL -->
+      <div id="content-detail-modal" class="modal hidden" onclick="closeModalOutside(event)">
+        <div class="modal-content">
+          <button id="close-modal" class="close-btn" onclick="closeModal()">×</button>
+          <div id="modal-body"></div>
         </div>
-      </main>
+      </div>
+    </main>
+  </div>
+  
+<script>
+// --- DATA pools ---
+const pillars = [
+  { id: 'p1', name: '🎛️ Studio Workflow', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#musicproduction', '#studioflow', '#ableton', '#techhouse', '#beatmaking'] },
+  { id: 'p2', name: '🎹 Sound Design Hack', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#sounddesign', '#serum', '#musicproducer', '#audioprocessing', '#abletonhacks'] },
+  { id: 'p3', name: '📚 Tutorial Especializado', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#productiontips', '#mezclaymaster', '#musicproducer', '#tutorial', '#learnmusic'] },
+  { id: 'p4', name: '🎧 Teaser Inédito', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#newmusic', '#upcomingrelease', '#phantomstudio', '#unreleased', '#snippet'] },
+  { id: 'p5', name: '🤝 Phantom Collab', type: 'Collab', difficulty: 'Medio', format: 'Short', hashtags: ['#collaboration', '#studiovibes', '#phantomteam', '#makingof', '#mexicocity'] },
+  { id: 'p6', name: '😂 Realidad del Productor', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#producermemes', '#relatable', '#studiolife', '#producerhumor', '#djproblems'] },
+  { id: 'p7', name: '💬 Análisis/Storytelling', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#musicstory', '#behindthescenes', '#musicbusiness', '#inspiration', '#artistjourney'] },
+  { id: 'p8', name: '🧠 Mindset & Psicología', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#lifestyle', '#psychology', '#mindset', '#creativeprocess', '#phantomidentity'] },
+  { id: 'p9', name: '🔥 Live Jam / Hardware', type: 'Solo/Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#liveset', '#hardware', '#abletonpush', '#synthjam', '#performance'] },
+  { id: 'p10', name: '📸 Gear Review', type: 'Solo', difficulty: 'Fácil', format: 'Carousel', hashtags: ['#studiophoto', '#gearporn', '#shuresm7b', '#phantomstudio', '#musicgear'] },
+  { id: 'p11', name: '🎬 Masterclass (Long Form)', type: 'Solo', difficulty: 'Difícil', format: 'Long', hashtags: ['#deepdive', '#youtube', '#musicindustry', '#masterclass', '#producertalk'] },
+  { id: 'p12', name: '🎤 Vocal/Freestyle Take', type: 'Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#freestyle', '#vocalrecording', '#improvisation', '#livevocals', '#phantomvibes'] }
+];
+
+const hooks = {
+  curiosity: [
+    "Descubrí un truco en Ableton que cambió por completo mi forma de mezclar...",
+    "El secreto que nadie te dice sobre cobrar regalías como artista independiente...",
+    "¿Qué pasa si aplicas distorsión armónica a un kick de Tech House? Escucha esto...",
+    "POV: Construiste tu propio controlador MIDI y suena así...",
+    "La técnica de ecualización que hace que tu voz corte cualquier mezcla..."
+  ],
+  comparison: [
+    "Un beat genérico vs Un beat con sound design avanzado",
+    "Grabar en tu cuarto vs Grabar con un Shure SM7B en Phantom Studio",
+    "Mi primera producción hace 5 años vs Mi último master final",
+    "Cómo sonaba la maqueta vs Cómo suena con arreglos de Jazz"
+  ],
+  challenge: [
+    "Intenta adivinar de qué sintetizador analógico salió este bajo...",
+    "Solo los productores que entienden de fase notarán este detalle...",
+    "A que no puedes tirar un freestyle sobre este beat híbrido...",
+    "¿Puedes reconocer si este saxofón es un plugin o grabado en vivo?"
+  ],
+  educational: [
+    "Cómo registrar tu nombre artístico en México en 3 simples pasos...",
+    "La guía definitiva para usar Serum si haces Bass Music...",
+    "Cómo presupuestar tu próximo release sin quedarte en la quiebra...",
+    "Deja de usar reverb en los bajos. Haz esto para limpiar tu low-end..."
+  ],
+  story: [
+    "La historia de cómo un sample de vinilo antiguo se convirtió en nuestro próximo track...",
+    "Por qué decidí mezclar ingeniería mecatrónica con producción musical...",
+    "Cómo un bloqueo creativo me llevó a estudiar la psicología de la música...",
+    "Lo que aprendí negociando mi primer split de regalías..."
+  ]
+};
+
+const talkingPoints = [
+  "Da el contexto del problema: 'Siempre batallaba con X hasta que...'",
+  "Muestra el 'Antes' rápidamente para establecer contraste.",
+  "Explica la solución técnica paso a paso usando la pantalla.",
+  "Comparte un consejo de mentalidad o 'mindset' relacionado al proceso.",
+  "Menciona cómo esto encaja en la visión a largo plazo de Phantom Studio.",
+  "Cierra con una pregunta abierta a la audiencia (ej: '¿Tú qué plugin usas?').",
+  "Habla sobre los costos o el valor (ej: 'Esta técnica es gratis y suena a millón').",
+  "Remarca la importancia del derecho de autor y la protección de la obra."
+];
+
+const team = [
+  { id: 'chino', name: 'ElChinoVALDRM', role: 'Fundador / Productor / Multi-instrumentalist', avatar: '👻', color: 'tilin', 
+    topics: [
+      'Showcase de setup en vivo (Ableton Push + Hardware)', 
+      'Producción de Tech House / Afrohouse', 
+      'Grabación de Piano y Saxofón reales', 
+      'Visión empresarial y filosofía de Phantom Studio'
+    ] 
+  },
+  { id: 'tilin', name: 'Tilin', role: 'Artista / Jazz Spirit', avatar: '🎷', color: 'tilin',
+    topics: [
+      'Progresiones y armonía de Jazz aplicadas a beats modernos', 
+      'Creación de texturas psicodélicas con pedales/efectos', 
+      'Improvisación de guitarra sobre bases electrónicas', 
+      'Mentalidad creativa y flujo de trabajo libre'
+    ] 
+  },
+  { id: 'codex', name: 'Codex (Ian)', role: 'Productor / Mechatronic Artist', avatar: '🤖', color: 'codex',
+    topics: [
+      'Diseño de controladores MIDI o hardware custom (Mecatrónica)', 
+      'Técnicas de producción de Reggaetón y Guaracha pesada', 
+      'Storytelling de vida urbana y resiliencia (Ecatepec)', 
+      'Sesiones de Freestyle crudo'
+    ] 
+  },
+  { id: 'ridd', name: 'Ridd (Mau)', role: 'Cantante / Asesor Legal', avatar: '⚖️', color: 'ridd',
+    topics: [
+      'Tips legales obligatorios para productores y cantantes', 
+      'Cómo proteger tus beats y registrar tus obras (Copyright)', 
+      'Técnicas de entrenamiento y calentamiento vocal', 
+      'Composición de letras urbanas con profundidad emocional'
+    ] 
+  },
+  { id: 'vytruz', name: 'Vytruz (Allan)', role: 'Productor Pro / Finance Expert', avatar: '📉', color: 'vytruz',
+    topics: [
+      'Manejo de finanzas, presupuestos y ROI para artistas', 
+      'Workflow avanzado en Mac Studio y optimización de CPU', 
+      'Técnicas quirúrgicas de Bass Music y Sound Design en Serum', 
+      'Procesamiento vocal profesional con Shure SM7B'
+    ] 
+  }
+];
+
+const effects = [
+  "Transición: Whip pan rápido para cambiar de escena",
+  "Toma: Close-up extremo a las manos tocando el teclado/Push",
+  "Edición: Cortes rápidos y precisos sincronizados con el beat (Beat sync cut)",
+  "Efecto visual: Glitch analógico justo antes del drop",
+  "Toma: POV (Point of View) estilo primera persona operando el hardware",
+  "Efecto post: Color grading cálido, estilo 'Film Noir' o cinemático",
+  "Transición: Zoom punch agresivo hacia la pantalla",
+  "Toma: Timelapse del estudio organizándose o preparando una sesión",
+  "Efecto visual: Speed ramp (lento a rápido) para generar tensión",
+  "Toma: Pantalla dividida (Cara reaccionando al sonido + Interfaz de Ableton)"
+];
+
+// --- UTILS ---
+function createPRNG(seed) {
+  let state = seed % 2147483647;
+  if (state <= 0) state += 2147483646;
+  return function() {
+    state = (state * 16807) % 2147483647;
+    return (state - 1) / 2147483646;
+  };
+}
+
+function getRandomFrom(arr, prng) { return arr[Math.floor(prng() * arr.length)]; }
+
+function shuffle(array, prng) {
+  let currentIndex = array.length, randomIndex;
+  while (currentIndex !== 0) {
+    randomIndex = Math.floor(prng() * currentIndex);
+    currentIndex--;
+    [array[currentIndex], array[randomIndex]] = [array[randomIndex], array[currentIndex]];
+  }
+  return array;
+}
+
+// --- GENERATOR V2 ---
+function generateWeek(year, weekNumber) {
+  const seed = year * 1000 + weekNumber;
+  const prng = createPRNG(seed);
+  const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+  
+  const availablePillars = shuffle([...pillars], prng);
+  const weekData = [];
+
+  daysOfWeek.forEach((dayName, index) => {
+    const pillar = availablePillars[index % availablePillars.length];
+    const categoryKeys = Object.keys(hooks);
+    const hook = getRandomFrom(hooks[getRandomFrom(categoryKeys, prng)], prng);
+    const effect = getRandomFrom(effects, prng);
+    const points = shuffle([...talkingPoints], prng).slice(0, 2);
+    
+    let collabData = null;
+    if (pillar.type === 'Collab' || pillar.id === 'p9' || pillar.id === 'p12') {
+      const otherMembers = team.filter(m => m.id !== 'chino');
+      const partner = getRandomFrom(otherMembers, prng);
+      collabData = { person: partner.name, topic: getRandomFrom(partner.topics, prng) };
+    }
+
+    weekData.push({
+      dayName,
+      pillar,
+      hook,
+      effect,
+      talkingPoints: points,
+      collabData,
+      time: (index < 5) ? '18:00 - 21:00' : '11:00 - 15:00',
+      tags: [pillar.type, pillar.difficulty, pillar.format],
+      hashtags: ['#phantomstudio', ...pillar.hashtags].slice(0, 4)
+    });
+  });
+  return weekData;
+}
+
+// --- UI Rendering ---
+function renderCalendar(weekData) {
+  const container = document.getElementById('calendar-grid');
+  container.innerHTML = '';
+  weekData.forEach(day => {
+    const card = document.createElement('div');
+    card.className = 'day-card';
+    
+    // Convert regular tags into span elements
+    let tagsHtml = day.tags.map(tag => `<span class="tag ${tag.includes('Collab') ? 'collab' : ''} ${tag === 'Difícil' ? 'difficulty-advanced' : ''}">${tag}</span>`).join('');
+    
+    // Add HASHTAGS directly to the card so the user sees them immediately
+    let hashtagsHtml = day.hashtags.map(ht => `<span class="tag hashtag">${ht}</span>`).join('');
+
+    card.innerHTML = `
+      <div class="day-header"><span class="day-name">${day.dayName}</span><span class="day-time">${day.time}</span></div>
+      <div class="content-type">${day.pillar.name}</div>
+      <div class="hook-preview">"${day.hook}"</div>
+      <div class="tags">${tagsHtml}</div>
+      <div class="tags" style="margin-top: 8px;">${hashtagsHtml}</div>
+    `;
+    card.onclick = () => openModal(day);
+    container.appendChild(card);
+  });
+}
+
+function openModal(day) {
+  const modal = document.getElementById('content-detail-modal');
+  const body = document.getElementById('modal-body');
+  
+  let collabHtml = day.collabData ? `
+    <div class="detail-section">
+      <h3>🤝 Involucrar a: ${day.collabData.person}</h3>
+      <p><strong>Enfoque de la colaboración:</strong> ${day.collabData.topic}</p>
+    </div>` : '';
+
+  body.innerHTML = `
+    <h2 style="margin-bottom: 24px; font-size: 24px; color: var(--accent-cyan);">${day.dayName} — ${day.pillar.name}</h2>
+    <div class="detail-section"><h3>🎣 Gancho (Hook Inicial)</h3><p style="font-size: 18px; font-weight: 600;">"${day.hook}"</p></div>
+    ${collabHtml}
+    <div class="detail-section">
+      <h3>🗣️ Estructura del Guión (Talking Points)</h3>
+      <ul>
+        <li><strong>Fase 1:</strong> ${day.talkingPoints[0]}</li>
+        <li><strong>Fase 2:</strong> ${day.talkingPoints[1]}</li>
+      </ul>
     </div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+    <div class="detail-section">
+      <h3>🎬 Dirección de Cámara y Post-producción</h3>
+      <div class="script-box">
+        » TÉCNICA PRINCIPAL:
+        ${day.effect}
+        
+        » FLUJO SUGERIDO:
+        1. Primeros 3 seg: Hook verbal + Movimiento dinámico.
+        2. Desarrollo: Retención mostrando el proceso o el problema.
+        3. Cierre: Resolución clara + Call to Action a Phantom Studio.
+      </div>
+    </div>
+    <div class="detail-section">
+      <h3>🏷️ Hashtags Oficiales para Copiar</h3>
+      <div class="hashtags-box">${day.hashtags.join(' ')}</div>
+    </div>
+  `;
+  modal.classList.remove('hidden');
+}
+
+function renderGrowthTracker() {
+  const container = document.getElementById('account-list');
+  const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+  container.innerHTML = accounts.length ? '' : '<p style="color: var(--text-secondary);">No hay cuentas añadidas.</p>';
+  
+  let totalFollowers = 0;
+  accounts.forEach((acc, i) => {
+    totalFollowers += parseInt(acc.followers);
+    const progress = Math.min((acc.followers / acc.goal) * 100, 100);
+    const card = document.createElement('div');
+    card.className = 'account-card';
+    card.innerHTML = `
+      <div class="account-info"><h3>${acc.name}</h3><p>@${acc.handle}</p></div>
+      <div class="account-stats">
+        <div class="stat-labels"><span>${acc.followers} seg.</span><span>Meta: ${acc.goal}</span></div>
+        <div class="stat-bar-container"><div class="stat-bar-fill" style="width: ${progress}%"></div></div>
+      </div>
+      <button onclick="deleteAccount(${i})" style="background:transparent; border:none; color: #ff5555; cursor:pointer; font-size: 20px;">×</button>
+    `;
+    container.appendChild(card);
+  });
+  
+  document.getElementById('global-followers').innerText = totalFollowers;
+  document.getElementById('global-progress').style.width = `${Math.min((totalFollowers/1000)*100, 100)}%`;
+}
+
+function renderMemberStrategies() {
+  const container = document.getElementById('member-grid');
+  container.innerHTML = '';
+  
+  const date = new Date();
+  const weekSeed = date.getFullYear() * 100 + Math.ceil(date.getDate() / 7);
+  const prng = createPRNG(weekSeed);
+
+  team.forEach(m => {
+    const card = document.createElement('div');
+    card.className = `member-card ${m.color}`;
+    
+    // Pick unique topics for the week
+    const shuffledTopics = shuffle([...m.topics], prng);
+    const weeklyFocus = shuffledTopics[0];
+    const secondaryFocus = shuffledTopics[1];
+
+    card.innerHTML = `
+      <div class="member-header">
+        <div class="member-avatar">${m.avatar}</div>
+        <div class="member-info"><h3>${m.name}</h3><p>${m.role}</p></div>
+      </div>
+      <div class="member-topics">
+        <h5>Misión Estratégica Semanal</h5>
+        <div style="background: rgba(102, 252, 241, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid var(--accent-cyan);">
+           <strong>🎯 Foco Principal:</strong> ${weeklyFocus}
+        </div>
+        
+        <h5>Tus Pilares Expertos (Especialidades)</h5>
+        ${m.topics.map(t => `<span class="topic-tag">${t}</span>`).join('')}
+        
+        <div style="margin-top: 15px; font-size: 13px; color: var(--text-secondary);">
+          <strong>⚡ Tip de Contenido:</strong> Para esta semana graba un video corto (Short) abordando <em>"${secondaryFocus}"</em>. Entrega valor directo sin rodeos.
+        </div>
+        
+        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
+          <h5 style="font-size: 10px; color: var(--accent-magenta);">Propuesta de Hook (Gancho) para ti:</h5>
+          <p style="font-size: 13px; font-style: italic; color: var(--text-primary);">"${getRandomFrom(Object.values(hooks).flat(), prng)}"</p>
+        </div>
+      </div>
+    `;
+    container.appendChild(card);
+  });
+}
+
+function renderIdeas() {
+  const container = document.getElementById('ideas-container');
+  container.innerHTML = '';
+  const prng = createPRNG(Date.now());
+  for(let i=0; i<3; i++) {
+    const card = document.createElement('div');
+    card.className = 'idea-card';
+    card.innerHTML = `
+      <div class="idea-content">
+        <h4>Idea Rápida #${i+1}</h4>
+        <p style="font-style: italic; color: var(--text-primary); margin-bottom: 8px;">"${getRandomFrom(Object.values(hooks).flat(), prng)}"</p>
+        <p style="font-size: 13px; color: var(--text-secondary);"><strong>Visual:</strong> ${getRandomFrom(effects, prng)}</p>
+      </div>
+    `;
+    container.appendChild(card);
+  }
+}
+
+// --- STATE & EVENTS ---
+let currentWeekOffset = 0;
+
+function switchView(viewId, btnElement) {
+  // Hide all sections
+  document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  // Remove active from all buttons
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  
+  // Show target section
+  const section = document.getElementById(viewId);
+  if (section) section.classList.add('active');
+  
+  // Highlight clicked button
+  if (btnElement) btnElement.classList.add('active');
+}
+
+function changeWeek(direction) {
+  currentWeekOffset += direction;
+  loadWeek(currentWeekOffset);
+}
+
+function addAccount() {
+  const name = prompt("Nombre de la cuenta (Ej: Phantom Studio):");
+  if(!name) return;
+  const handle = prompt("Handle (Ej: phantom_studio):");
+  const followers = prompt("Seguidores actuales:");
+  const goal = prompt("Meta de seguidores:");
+  
+  if(name && handle && followers && goal) {
+    const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+    accounts.push({ name, handle, followers: parseInt(followers), goal: parseInt(goal) });
+    localStorage.setItem('phanto_accounts', JSON.stringify(accounts));
+    renderGrowthTracker();
+  }
+}
+
+function deleteAccount(index) {
+  if(confirm('¿Eliminar esta cuenta del tracker?')) {
+    const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+    accounts.splice(index, 1);
+    localStorage.setItem('phanto_accounts', JSON.stringify(accounts));
+    renderGrowthTracker();
+  }
+}
+
+function closeModal() {
+  document.getElementById('content-detail-modal').classList.add('hidden');
+}
+
+function closeModalOutside(event) {
+  if (event.target.id === 'content-detail-modal') {
+    closeModal();
+  }
+}
+
+function init() {
+  loadWeek(0);
+  renderGrowthTracker();
+  renderMemberStrategies();
+  renderIdeas();
+}
+
+function loadWeek(offset) {
+  const date = new Date();
+  date.setDate(date.getDate() + (offset * 7));
+  const startDate = new Date(date.getFullYear(), 0, 1);
+  const weekNumber = Math.ceil((((date - startDate) / 86400000) + startDate.getDay() + 1) / 7);
+  document.getElementById('week-title').innerText = `Semana ${weekNumber}, ${date.getFullYear()}` + (offset === 0 ? ' (Actual)' : '');
+  renderCalendar(generateWeek(date.getFullYear(), weekNumber));
+}
+
+// Auto-init
+window.onload = init;
+</script>
+</body>
 </html>
