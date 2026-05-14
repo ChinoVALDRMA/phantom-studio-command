@@ -162,6 +162,77 @@ h1.view-title { font-size: 28px; font-weight: 800; }
 ::-webkit-scrollbar-track { background: var(--bg-color); }
 ::-webkit-scrollbar-thumb { background: var(--bg-panel); border-radius: 4px; }
 ::-webkit-scrollbar-thumb:hover { background: var(--accent-cyan-dim); }
+
+/* --- RESPONSIVE DESIGN --- */
+@media (max-width: 768px) {
+  body {
+    flex-direction: column;
+    overflow-y: auto;
+    height: auto;
+  }
+  
+  .sidebar {
+    width: 100%;
+    height: auto;
+    padding: 16px;
+    border-right: none;
+    border-bottom: 1px solid var(--border-color);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(31, 40, 51, 0.95);
+    backdrop-filter: blur(15px);
+  }
+  
+  .logo {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+  }
+  
+  .logo h2 { font-size: 20px; }
+  .logo .subtitle { display: none; }
+  
+  nav {
+    flex-direction: row;
+    overflow-x: auto;
+    padding-bottom: 8px;
+    gap: 8px;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  .nav-btn {
+    white-space: nowrap;
+    padding: 8px 12px;
+    font-size: 13px;
+    flex-shrink: 0;
+  }
+  
+  .sidebar-section { display: none; } /* Hide tracker from mobile sidebar, show in view */
+  
+  .main-content {
+    padding: 20px;
+    overflow-y: visible;
+  }
+  
+  .top-nav {
+    flex-direction: column;
+    gap: 16px;
+    text-align: center;
+  }
+  
+  .view-title { font-size: 22px; }
+  
+  .calendar-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .modal-content {
+    width: 95%;
+    padding: 24px;
+  }
+}
 </style>
 </head>
 <body>
