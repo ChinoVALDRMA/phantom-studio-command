@@ -2,6 +2,7 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Phantom Studio Command Center</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <style>
@@ -95,7 +96,7 @@ nav { display: flex; flex-direction: column; gap: 10px; }
 .week-nav:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-cyan); }
 h1.view-title { font-size: 28px; font-weight: 800; }
 
-.calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 24px; }
+.calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
 .day-card { background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); }
 .day-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
 .day-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
@@ -108,7 +109,7 @@ h1.view-title { font-size: 28px; font-weight: 800; }
 .tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
 .tag { background: rgba(255, 255, 255, 0.08); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; }
 .tag.collab { background: rgba(255, 0, 255, 0.15); color: #ff99ff; border: 1px solid rgba(255, 0, 255, 0.2); }
-.tag.difficulty-advanced { color: #ff5555; }
+.tag.hashtag { background: rgba(102, 252, 241, 0.1); color: var(--accent-cyan); border: 1px solid rgba(102, 252, 241, 0.2); font-weight: bold; text-transform: lowercase;}
 
 /* Growth Tracker View */
 .account-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
@@ -153,7 +154,7 @@ h1.view-title { font-size: 28px; font-weight: 800; }
 .detail-section { margin-bottom: 28px; }
 .detail-section h3 { font-size: 18px; color: var(--accent-cyan); margin-bottom: 14px; border-bottom: 1px solid rgba(102, 252, 241, 0.15); padding-bottom: 10px; }
 .detail-section p, .detail-section ul { font-size: 15px; color: var(--text-secondary); line-height: 1.7; }
-.detail-section ul { padding-left: 20px; list-style-type: square; }
+.detail-section ul { padding-left: 20px; list-style-type: square; margin-top: 10px; }
 .script-box { background: rgba(0, 0, 0, 0.4); padding: 20px; border-radius: 12px; font-family: var(--font-mono); font-size: 14px; white-space: pre-wrap; border: 1px solid var(--border-color); margin-top: 12px; color: var(--accent-cyan); }
 .hashtags-box { margin-top: 16px; color: var(--accent-magenta); font-family: var(--font-mono); font-weight: 700; font-size: 14px; }
 
@@ -208,7 +209,7 @@ h1.view-title { font-size: 28px; font-weight: 800; }
     flex-shrink: 0;
   }
   
-  .sidebar-section { display: none; } /* Hide tracker from mobile sidebar, show in view */
+  .sidebar-section { display: none; }
   
   .main-content {
     padding: 20px;
@@ -242,10 +243,10 @@ h1.view-title { font-size: 28px; font-weight: 800; }
         <span class="subtitle">STUDIO COMMAND</span>
       </div>
       <nav>
-        <button id="nav-calendar" class="nav-btn active" data-view="calendar-view">📅 Calendario</button>
-        <button id="nav-growth" class="nav-btn" data-view="growth-view">📈 Growth Tracker</button>
-        <button id="nav-members" class="nav-btn" data-view="members-view">👥 Equipo PHANTO</button>
-        <button id="nav-ideas" class="nav-btn" data-view="ideas-view">💡 Banco de Ideas</button>
+        <button class="nav-btn active" onclick="switchView('calendar-view', this)">📅 Calendario</button>
+        <button class="nav-btn" onclick="switchView('growth-view', this)">📈 Growth Tracker</button>
+        <button class="nav-btn" onclick="switchView('members-view', this)">👥 Equipo Phantom</button>
+        <button class="nav-btn" onclick="switchView('ideas-view', this)">💡 Banco de Ideas</button>
       </nav>
       
       <div class="sidebar-section">
@@ -261,9 +262,9 @@ h1.view-title { font-size: 28px; font-weight: 800; }
       <!-- CALENDAR VIEW -->
       <section id="calendar-view" class="view-section active">
         <header class="top-nav">
-          <button id="prev-week" class="week-nav">← Semana Anterior</button>
+          <button id="prev-week" class="week-nav" onclick="changeWeek(-1)">← Semana Anterior</button>
           <h1 id="week-title" class="view-title">Semana Actual</h1>
-          <button id="next-week" class="week-nav">Siguiente Semana →</button>
+          <button id="next-week" class="week-nav" onclick="changeWeek(1)">Siguiente Semana →</button>
         </header>
         <div id="calendar-grid" class="calendar-grid"></div>
       </section>
@@ -273,28 +274,28 @@ h1.view-title { font-size: 28px; font-weight: 800; }
         <h1 class="view-title">Growth Tracker Multi-Cuenta</h1>
         <p style="color: var(--text-secondary); margin-top: 8px;">Gestiona el crecimiento de todas las cuentas del equipo.</p>
         <div id="account-list" class="account-list"></div>
-        <button id="add-account-btn" class="btn-add-account">+ Añadir Cuenta</button>
+        <button id="add-account-btn" class="btn-add-account" onclick="addAccount()">+ Añadir Cuenta</button>
       </section>
 
       <!-- MEMBERS VIEW -->
       <section id="members-view" class="view-section">
-        <h1 class="view-title">Estrategia Personalizada por Miembro</h1>
-        <p style="color: var(--text-secondary); margin-top: 8px;">Temas y enfoques específicos basados en el perfil de cada artista.</p>
+        <h1 class="view-title">Estrategia Operativa por Artista</h1>
+        <p style="color: var(--text-secondary); margin-top: 8px;">Asignaciones semanales basadas en las habilidades y el perfil de cada integrante.</p>
         <div id="member-grid" class="member-grid"></div>
       </section>
 
       <!-- IDEAS VIEW -->
       <section id="ideas-view" class="view-section">
         <h1 class="view-title">Banco de Ideas Relámpago</h1>
-        <p style="color: var(--text-secondary); margin-top: 8px; margin-bottom: 24px;">Genera ideas frescas cuando te sientas bloqueado.</p>
+        <p style="color: var(--text-secondary); margin-top: 8px; margin-bottom: 24px;">Genera hooks y conceptos rápidos cuando te sientas bloqueado.</p>
         <div id="ideas-container"></div>
-        <button id="refresh-ideas-btn" class="btn-refresh-ideas" style="margin-top: 20px;">Generar Nuevas Ideas</button>
+        <button id="refresh-ideas-btn" class="btn-refresh-ideas" onclick="renderIdeas()" style="margin-top: 20px;">Generar Nuevas Ideas</button>
       </section>
 
       <!-- MODAL -->
-      <div id="content-detail-modal" class="modal hidden">
+      <div id="content-detail-modal" class="modal hidden" onclick="closeModalOutside(event)">
         <div class="modal-content">
-          <button id="close-modal" class="close-btn">×</button>
+          <button id="close-modal" class="close-btn" onclick="closeModal()">×</button>
           <div id="modal-body"></div>
         </div>
       </div>
@@ -304,82 +305,119 @@ h1.view-title { font-size: 28px; font-weight: 800; }
 <script>
 // --- DATA pools ---
 const pillars = [
-  { id: 'p1', name: '🎛️ Studio Session', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#producerlife', '#studioflow', '#ableton', '#techhouse', '#beatmaking'] },
-  { id: 'p2', name: '🎹 Before/After Sound', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#sounddesign', '#mixing', '#musicproduction', '#beforeafter', '#audioprocessing'] },
-  { id: 'p3', name: '📚 Tutorial Rápido', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#productiontips', '#abletonhacks', '#musicproducer', '#tutorial', '#learnmusic'] },
-  { id: 'p4', name: '🎧 Track Preview', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#newmusic', '#upcomingrelease', '#phanto', '#afrohouse', '#snippet'] },
-  { id: 'p5', name: '🤝 Collab Session', type: 'Collab', difficulty: 'Medio', format: 'Short', hashtags: ['#collaboration', '#studiovibes', '#phantomteam', '#makingof', '#artists'] },
-  { id: 'p6', name: '😂 Humor de Productor', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#producermemes', '#relatable', '#studiolife', '#producerhumor', '#djproblems'] },
-  { id: 'p7', name: '💬 Storytelling', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#musicstory', '#behindthescenes', '#creativelife', '#inspiration', '#artistjourney'] },
-  { id: 'p8', name: '🧠 Psy/Lifestyle', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#lifestyle', '#psychology', '#mindset', '#creativeprocess', '#phantoidentity'] },
-  { id: 'p9', name: '🔥 Live Performance', type: 'Solo/Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#liveset', '#djset', '#performance', '#pioneer', '#pushlive'] },
-  { id: 'p10', name: '📸 Photo Mode', type: 'Solo', difficulty: 'Fácil', format: 'Carousel', hashtags: ['#studiophoto', '#gearporn', '#aesthetic', '#phantomstudio', '#musicgear'] },
-  { id: 'p11', name: '🎬 Deep Dive (YouTube)', type: 'Solo', difficulty: 'Difícil', format: 'Long', hashtags: ['#deepdive', '#youtube', '#longform', '#masterclass', '#producertalk'] },
-  { id: 'p12', name: '🎤 Freestyle/Jam', type: 'Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#freestyle', '#jamming', '#improvisation', '#livevocals', '#phantomvibes'] }
+  { id: 'p1', name: '🎛️ Studio Workflow', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#musicproduction', '#studioflow', '#ableton', '#techhouse', '#beatmaking'] },
+  { id: 'p2', name: '🎹 Sound Design Hack', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#sounddesign', '#serum', '#musicproducer', '#audioprocessing', '#abletonhacks'] },
+  { id: 'p3', name: '📚 Tutorial Especializado', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#productiontips', '#mezclaymaster', '#musicproducer', '#tutorial', '#learnmusic'] },
+  { id: 'p4', name: '🎧 Teaser Inédito', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#newmusic', '#upcomingrelease', '#phantomstudio', '#unreleased', '#snippet'] },
+  { id: 'p5', name: '🤝 Phantom Collab', type: 'Collab', difficulty: 'Medio', format: 'Short', hashtags: ['#collaboration', '#studiovibes', '#phantomteam', '#makingof', '#mexicocity'] },
+  { id: 'p6', name: '😂 Realidad del Productor', type: 'Solo', difficulty: 'Fácil', format: 'Short', hashtags: ['#producermemes', '#relatable', '#studiolife', '#producerhumor', '#djproblems'] },
+  { id: 'p7', name: '💬 Análisis/Storytelling', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#musicstory', '#behindthescenes', '#musicbusiness', '#inspiration', '#artistjourney'] },
+  { id: 'p8', name: '🧠 Mindset & Psicología', type: 'Solo', difficulty: 'Medio', format: 'Short', hashtags: ['#lifestyle', '#psychology', '#mindset', '#creativeprocess', '#phantomidentity'] },
+  { id: 'p9', name: '🔥 Live Jam / Hardware', type: 'Solo/Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#liveset', '#hardware', '#abletonpush', '#synthjam', '#performance'] },
+  { id: 'p10', name: '📸 Gear Review', type: 'Solo', difficulty: 'Fácil', format: 'Carousel', hashtags: ['#studiophoto', '#gearporn', '#shuresm7b', '#phantomstudio', '#musicgear'] },
+  { id: 'p11', name: '🎬 Masterclass (Long Form)', type: 'Solo', difficulty: 'Difícil', format: 'Long', hashtags: ['#deepdive', '#youtube', '#musicindustry', '#masterclass', '#producertalk'] },
+  { id: 'p12', name: '🎤 Vocal/Freestyle Take', type: 'Collab', difficulty: 'Difícil', format: 'Short', hashtags: ['#freestyle', '#vocalrecording', '#improvisation', '#livevocals', '#phantomvibes'] }
 ];
 
 const hooks = {
   curiosity: [
-    "No vas a creer cómo suena esto con un solo efecto...",
-    "El secreto que nadie te dice sobre los bajos en Tech House...",
-    "¿Qué pasa si mezclamos Cumbia con Afrohouse? Escucha esto...",
-    "POV: Encontraste EL sonido perfecto a las 3am...",
-    "El sample que me prohibieron usar pero que suena increíble..."
+    "Descubrí un truco en Ableton que cambió por completo mi forma de mezclar...",
+    "El secreto que nadie te dice sobre cobrar regalías como artista independiente...",
+    "¿Qué pasa si aplicas distorsión armónica a un kick de Tech House? Escucha esto...",
+    "POV: Construiste tu propio controlador MIDI y suena así...",
+    "La técnica de ecualización que hace que tu voz corte cualquier mezcla..."
   ],
   comparison: [
-    "Esto tardó 5 minutos vs Esto tardó 5 horas",
-    "Plugin de $200 vs Plugin Gratis. ¿Notas la diferencia?",
-    "Mi primera producción vs Mi último track",
-    "Cómo sonaba mi demo vs Cómo suena el master final"
+    "Un beat genérico vs Un beat con sound design avanzado",
+    "Grabar en tu cuarto vs Grabar con un Shure SM7B en Phantom Studio",
+    "Mi primera producción hace 5 años vs Mi último master final",
+    "Cómo sonaba la maqueta vs Cómo suena con arreglos de Jazz"
   ],
   challenge: [
-    "Intenta no mover la cabeza con este beat...",
-    "Solo el 1% de los productores identifica este sample...",
-    "A que no adivinas de dónde saqué este sonido...",
-    "¿Puedes reconocer este instrumento oculto en el mix?"
+    "Intenta adivinar de qué sintetizador analógico salió este bajo...",
+    "Solo los productores que entienden de fase notarán este detalle...",
+    "A que no puedes tirar un freestyle sobre este beat híbrido...",
+    "¿Puedes reconocer si este saxofón es un plugin o grabado en vivo?"
   ],
   educational: [
-    "El truco en Ableton que me ahorra horas...",
-    "Cómo hacer que tu bajo suene GORDO en 3 pasos...",
-    "Deja de usar reverb así. Haz esto en su lugar...",
-    "La cadena de efectos 'mágica' para mis voces..."
+    "Cómo registrar tu nombre artístico en México en 3 simples pasos...",
+    "La guía definitiva para usar Serum si haces Bass Music...",
+    "Cómo presupuestar tu próximo release sin quedarte en la quiebra...",
+    "Deja de usar reverb en los bajos. Haz esto para limpiar tu low-end..."
   ],
   story: [
-    "La historia de cómo este track casi nunca sale...",
-    "Estaba a punto de borrar este proyecto hasta que...",
-    "Cómo un mal día en el estudio terminó en mi mejor beat...",
-    "Lo que aprendí trabajando con este artista de la escena..."
+    "La historia de cómo un sample de vinilo antiguo se convirtió en nuestro próximo track...",
+    "Por qué decidí mezclar ingeniería mecatrónica con producción musical...",
+    "Cómo un bloqueo creativo me llevó a estudiar la psicología de la música...",
+    "Lo que aprendí negociando mi primer split de regalías..."
   ]
 };
 
 const talkingPoints = [
-  "Explica por qué elegiste este sonido específico.",
-  "Muestra tu cara de reacción al escuchar el drop.",
-  "Comenta qué problema estabas intentando resolver.",
-  "Haz una pregunta a la audiencia sobre su plugin favorito.",
-  "Menciona que este track será parte del próximo release de PHANTO.",
-  "Aclara que la simplicidad a veces es mejor que la complejidad."
+  "Da el contexto del problema: 'Siempre batallaba con X hasta que...'",
+  "Muestra el 'Antes' rápidamente para establecer contraste.",
+  "Explica la solución técnica paso a paso usando la pantalla.",
+  "Comparte un consejo de mentalidad o 'mindset' relacionado al proceso.",
+  "Menciona cómo esto encaja en la visión a largo plazo de Phantom Studio.",
+  "Cierra con una pregunta abierta a la audiencia (ej: '¿Tú qué plugin usas?').",
+  "Habla sobre los costos o el valor (ej: 'Esta técnica es gratis y suena a millón').",
+  "Remarca la importancia del derecho de autor y la protección de la obra."
 ];
 
 const team = [
-  { id: 'chino', name: 'ElChinoVALDRM', role: 'Fundador / Productor / Multi-instrumentalist', avatar: '👻', topics: ['Tech House Vibes con Piano/Sax', 'Estrategia de crecimiento Phanto', 'Live performance setup', 'Conectando talento musical'], color: 'tilin' },
-  { id: 'tilin', name: 'Tilin', role: 'Artista / Jazz Spirit', avatar: '🎷', topics: ['Jazz & Urbano Fusion', 'Exploración psicodélica con guitarra', 'Estética única y perforaciones', 'Vibras de estudio y motivación'], color: 'tilin' },
-  { id: 'codex', name: 'Codex (Ian)', role: 'Productor / Mechatronic Artist', avatar: '🤖', topics: ['Beats de Ecatepec para el mundo', 'Ingeniería Mecatrónica aplicada al sonido', 'Reggaetón, Trap & Guaracha crossover', 'Freestyle y rimas crudas'], color: 'codex' },
-  { id: 'ridd', name: 'Ridd (Mau)', role: 'Cantante / Asesor Legal', avatar: '⚖️', topics: ['Derechos de autor para productores', 'Voz urbana con sentimiento', 'Leyes vs Realidad de la industria', 'Entrenamiento vocal desde cero'], color: 'ridd' },
-  { id: 'vytruz', name: 'Vytruz (Allan)', role: 'Productor Pro / Finance Expert', avatar: '📉', topics: ['Workflow de Mac Studio & Shure SM7B', 'Finanzas y ahorro para músicos', 'Bass music de alta precisión', 'Uso avanzado de Serum & Splice'], color: 'vytruz' }
+  { id: 'chino', name: 'ElChinoVALDRM', role: 'Fundador / Productor / Multi-instrumentalist', avatar: '👻', color: 'tilin', 
+    topics: [
+      'Showcase de setup en vivo (Ableton Push + Hardware)', 
+      'Producción de Tech House / Afrohouse', 
+      'Grabación de Piano y Saxofón reales', 
+      'Visión empresarial y filosofía de Phantom Studio'
+    ] 
+  },
+  { id: 'tilin', name: 'Tilin', role: 'Artista / Jazz Spirit', avatar: '🎷', color: 'tilin',
+    topics: [
+      'Progresiones y armonía de Jazz aplicadas a beats modernos', 
+      'Creación de texturas psicodélicas con pedales/efectos', 
+      'Improvisación de guitarra sobre bases electrónicas', 
+      'Mentalidad creativa y flujo de trabajo libre'
+    ] 
+  },
+  { id: 'codex', name: 'Codex (Ian)', role: 'Productor / Mechatronic Artist', avatar: '🤖', color: 'codex',
+    topics: [
+      'Diseño de controladores MIDI o hardware custom (Mecatrónica)', 
+      'Técnicas de producción de Reggaetón y Guaracha pesada', 
+      'Storytelling de vida urbana y resiliencia (Ecatepec)', 
+      'Sesiones de Freestyle crudo'
+    ] 
+  },
+  { id: 'ridd', name: 'Ridd (Mau)', role: 'Cantante / Asesor Legal', avatar: '⚖️', color: 'ridd',
+    topics: [
+      'Tips legales obligatorios para productores y cantantes', 
+      'Cómo proteger tus beats y registrar tus obras (Copyright)', 
+      'Técnicas de entrenamiento y calentamiento vocal', 
+      'Composición de letras urbanas con profundidad emocional'
+    ] 
+  },
+  { id: 'vytruz', name: 'Vytruz (Allan)', role: 'Productor Pro / Finance Expert', avatar: '📉', color: 'vytruz',
+    topics: [
+      'Manejo de finanzas, presupuestos y ROI para artistas', 
+      'Workflow avanzado en Mac Studio y optimización de CPU', 
+      'Técnicas quirúrgicas de Bass Music y Sound Design en Serum', 
+      'Procesamiento vocal profesional con Shure SM7B'
+    ] 
+  }
 ];
 
 const effects = [
-  "Transición: Whip pan rápido",
-  "Toma: Close-up manos en Push/Teclado",
-  "Edición: Cortes rápidos al ritmo (Beat sync cut)",
-  "Efecto visual: Glitch en el drop",
-  "Toma: POV estilo primera persona produciendo",
-  "Efecto post: Color grading cálido/analógico (Film Noir)",
-  "Transición: Zoom punch agresivo",
-  "Toma: Timelapse del estudio organizándose",
-  "Efecto visual: Speed ramp (lento a rápido) justo antes del drop",
-  "Toma: Pantalla dividida (cara reaccionando + Ableton screen)"
+  "Transición: Whip pan rápido para cambiar de escena",
+  "Toma: Close-up extremo a las manos tocando el teclado/Push",
+  "Edición: Cortes rápidos y precisos sincronizados con el beat (Beat sync cut)",
+  "Efecto visual: Glitch analógico justo antes del drop",
+  "Toma: POV (Point of View) estilo primera persona operando el hardware",
+  "Efecto post: Color grading cálido, estilo 'Film Noir' o cinemático",
+  "Transición: Zoom punch agresivo hacia la pantalla",
+  "Toma: Timelapse del estudio organizándose o preparando una sesión",
+  "Efecto visual: Speed ramp (lento a rápido) para generar tensión",
+  "Toma: Pantalla dividida (Cara reaccionando al sonido + Interfaz de Ableton)"
 ];
 
 // --- UTILS ---
@@ -410,7 +448,6 @@ function generateWeek(year, weekNumber) {
   const prng = createPRNG(seed);
   const daysOfWeek = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
   
-  // Ensure variety: shuffle pillars and pick first 7
   const availablePillars = shuffle([...pillars], prng);
   const weekData = [];
 
@@ -437,7 +474,7 @@ function generateWeek(year, weekNumber) {
       collabData,
       time: (index < 5) ? '18:00 - 21:00' : '11:00 - 15:00',
       tags: [pillar.type, pillar.difficulty, pillar.format],
-      hashtags: pillar.hashtags
+      hashtags: ['#phantomstudio', ...pillar.hashtags].slice(0, 4)
     });
   });
   return weekData;
@@ -450,15 +487,21 @@ function renderCalendar(weekData) {
   weekData.forEach(day => {
     const card = document.createElement('div');
     card.className = 'day-card';
-    const tagsHtml = day.tags.map(tag => `<span class="tag ${tag.includes('Collab') ? 'collab' : ''} ${tag === 'Difícil' ? 'difficulty-advanced' : ''}">${tag}</span>`).join('');
     
+    // Convert regular tags into span elements
+    let tagsHtml = day.tags.map(tag => `<span class="tag ${tag.includes('Collab') ? 'collab' : ''} ${tag === 'Difícil' ? 'difficulty-advanced' : ''}">${tag}</span>`).join('');
+    
+    // Add HASHTAGS directly to the card so the user sees them immediately
+    let hashtagsHtml = day.hashtags.map(ht => `<span class="tag hashtag">${ht}</span>`).join('');
+
     card.innerHTML = `
       <div class="day-header"><span class="day-name">${day.dayName}</span><span class="day-time">${day.time}</span></div>
       <div class="content-type">${day.pillar.name}</div>
       <div class="hook-preview">"${day.hook}"</div>
       <div class="tags">${tagsHtml}</div>
+      <div class="tags" style="margin-top: 8px;">${hashtagsHtml}</div>
     `;
-    card.addEventListener('click', () => openModal(day));
+    card.onclick = () => openModal(day);
     container.appendChild(card);
   });
 }
@@ -469,29 +512,36 @@ function openModal(day) {
   
   let collabHtml = day.collabData ? `
     <div class="detail-section">
-      <h3>🤝 Colaboración con ${day.collabData.person}</h3>
-      <p><strong>Enfoque:</strong> ${day.collabData.topic}</p>
+      <h3>🤝 Involucrar a: ${day.collabData.person}</h3>
+      <p><strong>Enfoque de la colaboración:</strong> ${day.collabData.topic}</p>
     </div>` : '';
 
   body.innerHTML = `
     <h2 style="margin-bottom: 24px; font-size: 24px; color: var(--accent-cyan);">${day.dayName} — ${day.pillar.name}</h2>
-    <div class="detail-section"><h3>🎣 Gancho (Hook)</h3><p style="font-size: 18px; font-weight: 600;">"${day.hook}"</p></div>
+    <div class="detail-section"><h3>🎣 Gancho (Hook Inicial)</h3><p style="font-size: 18px; font-weight: 600;">"${day.hook}"</p></div>
     ${collabHtml}
     <div class="detail-section">
-      <h3>🗣️ Qué decir (Talking Points)</h3>
-      <ul>${day.talkingPoints.map(p => `<li>${p}</li>`).join('')}</ul>
+      <h3>🗣️ Estructura del Guión (Talking Points)</h3>
+      <ul>
+        <li><strong>Fase 1:</strong> ${day.talkingPoints[0]}</li>
+        <li><strong>Fase 2:</strong> ${day.talkingPoints[1]}</li>
+      </ul>
     </div>
     <div class="detail-section">
-      <h3>🎬 Guión & Estética</h3>
+      <h3>🎬 Dirección de Cámara y Post-producción</h3>
       <div class="script-box">
-        1. START: Hook visual y verbal.
-        2. MID: ${day.effect}. Mostrar proceso.
-        3. END: Resultado sonoro + CTA a seguir a PHANTO.
+        » TÉCNICA PRINCIPAL:
+        ${day.effect}
+        
+        » FLUJO SUGERIDO:
+        1. Primeros 3 seg: Hook verbal + Movimiento dinámico.
+        2. Desarrollo: Retención mostrando el proceso o el problema.
+        3. Cierre: Resolución clara + Call to Action a Phantom Studio.
       </div>
     </div>
     <div class="detail-section">
-      <h3>🏷️ Hashtags recomendados</h3>
-      <div class="hashtags-box">${day.hashtags.join(' ')} #phantomstudio #elchino</div>
+      <h3>🏷️ Hashtags Oficiales para Copiar</h3>
+      <div class="hashtags-box">${day.hashtags.join(' ')}</div>
     </div>
   `;
   modal.classList.remove('hidden');
@@ -527,7 +577,6 @@ function renderMemberStrategies() {
   const container = document.getElementById('member-grid');
   container.innerHTML = '';
   
-  // Use current week for seeded randomness
   const date = new Date();
   const weekSeed = date.getFullYear() * 100 + Math.ceil(date.getDate() / 7);
   const prng = createPRNG(weekSeed);
@@ -536,9 +585,10 @@ function renderMemberStrategies() {
     const card = document.createElement('div');
     card.className = `member-card ${m.color}`;
     
-    // Generate a weekly focus based on their specific topics
-    const weeklyFocus = shuffle([...m.topics], prng)[0];
-    const secondaryFocus = shuffle([...m.topics], prng)[1];
+    // Pick unique topics for the week
+    const shuffledTopics = shuffle([...m.topics], prng);
+    const weeklyFocus = shuffledTopics[0];
+    const secondaryFocus = shuffledTopics[1];
 
     card.innerHTML = `
       <div class="member-header">
@@ -546,21 +596,21 @@ function renderMemberStrategies() {
         <div class="member-info"><h3>${m.name}</h3><p>${m.role}</p></div>
       </div>
       <div class="member-topics">
-        <h5>Misión Semanal (Personalizada)</h5>
+        <h5>Misión Estratégica Semanal</h5>
         <div style="background: rgba(102, 252, 241, 0.1); padding: 12px; border-radius: 8px; margin-bottom: 15px; border-left: 3px solid var(--accent-cyan);">
-           <strong>Tema Central:</strong> ${weeklyFocus}
+           <strong>🎯 Foco Principal:</strong> ${weeklyFocus}
         </div>
         
-        <h5>Tus Pilares de Contenido</h5>
+        <h5>Tus Pilares Expertos (Especialidades)</h5>
         ${m.topics.map(t => `<span class="topic-tag">${t}</span>`).join('')}
         
         <div style="margin-top: 15px; font-size: 13px; color: var(--text-secondary);">
-          <strong>Tip del Comandante:</strong> Esta semana, haz un video corto hablando sobre <em>"${secondaryFocus}"</em>. Usa un tono que conecte con tu audiencia.
+          <strong>⚡ Tip de Contenido:</strong> Para esta semana graba un video corto (Short) abordando <em>"${secondaryFocus}"</em>. Entrega valor directo sin rodeos.
         </div>
         
         <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1);">
-          <h5 style="font-size: 10px; color: var(--accent-magenta);">Sugerencia de Hook Personalizado:</h5>
-          <p style="font-size: 13px; font-style: italic;">"${getRandomFrom(Object.values(hooks).flat(), prng)}"</p>
+          <h5 style="font-size: 10px; color: var(--accent-magenta);">Propuesta de Hook (Gancho) para ti:</h5>
+          <p style="font-size: 13px; font-style: italic; color: var(--text-primary);">"${getRandomFrom(Object.values(hooks).flat(), prng)}"</p>
         </div>
       </div>
     `;
@@ -577,8 +627,9 @@ function renderIdeas() {
     card.className = 'idea-card';
     card.innerHTML = `
       <div class="idea-content">
-        <h4>Idea #${i+1}</h4>
-        <p>"${getRandomFrom(Object.values(hooks).flat(), prng)}" usando "${getRandomFrom(effects, prng)}"</p>
+        <h4>Idea Rápida #${i+1}</h4>
+        <p style="font-style: italic; color: var(--text-primary); margin-bottom: 8px;">"${getRandomFrom(Object.values(hooks).flat(), prng)}"</p>
+        <p style="font-size: 13px; color: var(--text-secondary);"><strong>Visual:</strong> ${getRandomFrom(effects, prng)}</p>
       </div>
     `;
     container.appendChild(card);
@@ -588,18 +639,32 @@ function renderIdeas() {
 // --- STATE & EVENTS ---
 let currentWeekOffset = 0;
 
-function switchView(viewId) {
+function switchView(viewId, btnElement) {
+  // Hide all sections
   document.querySelectorAll('.view-section').forEach(s => s.classList.remove('active'));
+  // Remove active from all buttons
   document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  document.getElementById(viewId).classList.add('active');
-  document.querySelector(`[data-view="${viewId}"]`).classList.add('active');
+  
+  // Show target section
+  const section = document.getElementById(viewId);
+  if (section) section.classList.add('active');
+  
+  // Highlight clicked button
+  if (btnElement) btnElement.classList.add('active');
+}
+
+function changeWeek(direction) {
+  currentWeekOffset += direction;
+  loadWeek(currentWeekOffset);
 }
 
 function addAccount() {
-  const name = prompt("Nombre de la cuenta:");
-  const handle = prompt("Handle (ej: elchino_phanto):");
+  const name = prompt("Nombre de la cuenta (Ej: Phantom Studio):");
+  if(!name) return;
+  const handle = prompt("Handle (Ej: phantom_studio):");
   const followers = prompt("Seguidores actuales:");
   const goal = prompt("Meta de seguidores:");
+  
   if(name && handle && followers && goal) {
     const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
     accounts.push({ name, handle, followers: parseInt(followers), goal: parseInt(goal) });
@@ -609,10 +674,22 @@ function addAccount() {
 }
 
 function deleteAccount(index) {
-  const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
-  accounts.splice(index, 1);
-  localStorage.setItem('phanto_accounts', JSON.stringify(accounts));
-  renderGrowthTracker();
+  if(confirm('¿Eliminar esta cuenta del tracker?')) {
+    const accounts = JSON.parse(localStorage.getItem('phanto_accounts') || '[]');
+    accounts.splice(index, 1);
+    localStorage.setItem('phanto_accounts', JSON.stringify(accounts));
+    renderGrowthTracker();
+  }
+}
+
+function closeModal() {
+  document.getElementById('content-detail-modal').classList.add('hidden');
+}
+
+function closeModalOutside(event) {
+  if (event.target.id === 'content-detail-modal') {
+    closeModal();
+  }
 }
 
 function init() {
@@ -620,22 +697,6 @@ function init() {
   renderGrowthTracker();
   renderMemberStrategies();
   renderIdeas();
-  
-  // Nav events
-  document.querySelectorAll('.nav-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      switchView(btn.dataset.view);
-    });
-  });
-  
-  document.getElementById('prev-week').onclick = () => { currentWeekOffset--; loadWeek(currentWeekOffset); };
-  document.getElementById('next-week').onclick = () => { currentWeekOffset++; loadWeek(currentWeekOffset); };
-  document.getElementById('close-modal').onclick = () => document.getElementById('content-detail-modal').classList.add('hidden');
-  document.getElementById('add-account-btn').onclick = addAccount;
-  document.getElementById('refresh-ideas-btn').onclick = renderIdeas;
-  
-  window.onclick = (e) => { if(e.target.id === 'content-detail-modal') e.target.classList.add('hidden'); };
 }
 
 function loadWeek(offset) {
@@ -647,7 +708,8 @@ function loadWeek(offset) {
   renderCalendar(generateWeek(date.getFullYear(), weekNumber));
 }
 
-init();
+// Auto-init
+window.onload = init;
 </script>
 </body>
 </html>
