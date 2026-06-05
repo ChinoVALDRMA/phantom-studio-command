@@ -1,0 +1,599 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Phantom Studio Command Center</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg-color: #0b0c10;
+  --bg-panel: #1f2833;
+  --text-primary: #ffffff;
+  --text-secondary: #c5c6c7;
+  --accent-cyan: #66fcf1;
+  --accent-cyan-dim: #45a29e;
+  --accent-magenta: #ff00ff;
+  --accent-amber: #ffb000;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --glass-bg: rgba(31, 40, 51, 0.6);
+  --font-main: 'Inter', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  display: flex;
+  height: 100vh;
+  width: 100vw;
+  overflow: hidden;
+}
+
+#app {
+  display: flex;
+  width: 100%;
+  height: 100%;
+}
+
+.sidebar {
+  width: 280px;
+  background-color: var(--bg-panel);
+  border-right: 1px solid var(--border-color);
+  display: flex;
+  flex-direction: column;
+  padding: 24px;
+  gap: 24px;
+  flex-shrink: 0;
+}
+
+.logo h2 {
+  font-weight: 800;
+  letter-spacing: 2px;
+  background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  font-size: 24px;
+}
+
+.logo .subtitle {
+  font-size: 11px;
+  color: var(--text-secondary);
+  letter-spacing: 3px;
+  font-family: var(--font-mono);
+}
+
+nav { display: flex; flex-direction: column; gap: 10px; }
+
+.nav-btn {
+  background: transparent; border: 1px solid transparent; color: var(--text-secondary);
+  padding: 12px 16px; text-align: left; font-family: var(--font-main);
+  font-size: 15px; font-weight: 600; border-radius: 8px; cursor: pointer; transition: all 0.3s ease;
+  display: flex; align-items: center; gap: 8px;
+}
+
+.nav-btn:hover { background-color: rgba(255, 255, 255, 0.05); color: var(--text-primary); }
+.nav-btn.active { background-color: rgba(102, 252, 241, 0.1); color: var(--accent-cyan); border: 1px solid rgba(102, 252, 241, 0.2); }
+
+.sidebar-section {
+  border-top: 1px solid var(--border-color);
+  padding-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.sidebar-section h4 { font-size: 12px; color: var(--text-secondary); text-transform: uppercase; letter-spacing: 1px; }
+
+.main-content { flex: 1; display: flex; flex-direction: column; padding: 32px; overflow-y: auto; overflow-x: hidden; }
+.view-section { display: none; width: 100%; }
+.view-section.active { display: block; animation: fadeIn 0.4s ease; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+.top-nav { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; gap: 10px; }
+.week-nav { background: transparent; border: 1px solid var(--border-color); color: var(--text-primary); padding: 8px 16px; border-radius: 8px; cursor: pointer; font-family: var(--font-mono); font-size: 13px; white-space: nowrap; }
+.week-nav:hover { background: rgba(255, 255, 255, 0.1); border-color: var(--accent-cyan); }
+h1.view-title { font-size: 28px; font-weight: 800; }
+
+.calendar-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 24px; }
+.day-card { background: var(--glass-bg); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; flex-direction: column; gap: 16px; cursor: pointer; transition: all 0.3s ease; backdrop-filter: blur(10px); }
+.day-card:hover { transform: translateY(-4px); border-color: var(--accent-cyan-dim); box-shadow: 0 8px 24px rgba(0, 0, 0, 0.4); }
+.day-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--border-color); padding-bottom: 12px; }
+.day-name { font-weight: 800; font-size: 18px; color: var(--accent-cyan); }
+.day-time { font-family: var(--font-mono); font-size: 11px; color: var(--text-secondary); }
+
+.content-type { font-size: 14px; font-weight: 700; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
+.hook-preview { font-style: italic; font-size: 13px; color: var(--text-secondary); line-height: 1.5; background: rgba(0,0,0,0.2); padding: 8px; border-radius: 6px; min-height: 60px; }
+
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: auto; }
+.tag { background: rgba(255, 255, 255, 0.08); padding: 4px 8px; border-radius: 4px; font-size: 10px; font-family: var(--font-mono); text-transform: uppercase; }
+.tag.collab { background: rgba(255, 0, 255, 0.15); color: #ff99ff; border: 1px solid rgba(255, 0, 255, 0.2); }
+.tag.hashtag { background: rgba(102, 252, 241, 0.1); color: var(--accent-cyan); border: 1px solid rgba(102, 252, 241, 0.2); font-weight: bold; text-transform: lowercase; }
+
+/* Growth Tracker View */
+.account-list { display: flex; flex-direction: column; gap: 16px; margin-top: 24px; }
+.account-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 12px; padding: 20px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
+.account-info h3 { font-size: 18px; margin-bottom: 4px; }
+.account-info p { color: var(--text-secondary); font-family: var(--font-mono); font-size: 13px; }
+.account-stats { flex: 1; max-width: 400px; }
+.stat-bar-container { background: rgba(255,255,255,0.05); height: 10px; border-radius: 5px; margin: 8px 0; overflow: hidden; }
+.stat-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent-cyan), var(--accent-magenta)); width: 0; transition: width 0.8s ease; }
+.stat-labels { display: flex; justify-content: space-between; font-size: 12px; font-family: var(--font-mono); }
+
+.btn-add-account { background: var(--accent-cyan); color: var(--bg-color); border: none; padding: 10px 20px; border-radius: 8px; font-weight: 700; cursor: pointer; margin-top: 16px; }
+
+/* Member Section */
+.member-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 24px; margin-top: 24px; }
+.member-card { background: var(--bg-panel); border: 1px solid var(--border-color); border-radius: 16px; padding: 24px; position: relative; overflow: hidden; }
+.member-card::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: var(--accent-cyan); }
+.member-card.tilin::after { background: var(--accent-magenta); }
+.member-card.codex::after { background: #ff5555; }
+.member-card.ridd::after { background: var(--accent-amber); }
+.member-card.vytruz::after { background: #55ff55; }
+
+.member-header { display: flex; align-items: center; gap: 16px; margin-bottom: 20px; }
+.member-avatar { width: 60px; height: 60px; background: rgba(255,255,255,0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 24px; }
+
+.member-topics { background: rgba(0,0,0,0.2); padding: 16px; border-radius: 12px; }
+.member-topics h5 { font-size: 12px; text-transform: uppercase; margin-bottom: 10px; color: var(--text-secondary); }
+.topic-tag { display: inline-block; background: rgba(255,255,255,0.05); padding: 4px 10px; border-radius: 15px; font-size: 12px; margin: 0 4px 4px 0; border: 1px solid rgba(255,255,255,0.1); }
+
+/* Modal */
+.modal { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(11, 12, 16, 0.85); backdrop-filter: blur(8px); display: flex; justify-content: center; align-items: center; z-index: 1000; transition: opacity 0.3s ease; }
+.modal.hidden { opacity: 0; pointer-events: none; }
+.modal-content { background: var(--bg-panel); width: 95%; max-width: 900px; max-height: 90vh; border-radius: 20px; border: 1px solid var(--border-color); box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6); overflow-y: auto; position: relative; padding: 30px; }
+.close-btn { position: absolute; top: 15px; right: 20px; background: transparent; border: none; color: var(--text-secondary); font-size: 32px; cursor: pointer; }
+
+/* --- AGGRESSIVE RESPONSIVE DESIGN --- */
+@media (max-width: 900px) {
+  body {
+    display: block !important;
+    overflow-y: auto !important;
+    height: auto !important;
+    width: 100% !important;
+  }
+  
+  #app {
+    display: block !important;
+  }
+
+  .sidebar {
+    width: 100% !important;
+    height: auto !important;
+    padding: 20px !important;
+    border-right: none !important;
+    border-bottom: 1px solid var(--border-color) !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 100 !important;
+    background: rgba(31, 40, 51, 0.98) !important;
+    backdrop-filter: blur(15px) !important;
+  }
+  
+  .logo {
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    margin-bottom: 15px !important;
+  }
+  
+  .logo h2 { font-size: 20px !important; }
+  .logo .subtitle { display: none !important; }
+  
+  nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding-bottom: 10px !important;
+    gap: 10px !important;
+    -webkit-overflow-scrolling: touch !important;
+    width: 100% !important;
+  }
+  
+  .nav-btn {
+    white-space: nowrap !important;
+    padding: 10px 15px !important;
+    font-size: 13px !important;
+    flex-shrink: 0 !important;
+    border: 1px solid rgba(255,255,255,0.1) !important;
+  }
+  
+  .sidebar-section { display: none !important; }
+  
+  .main-content {
+    padding: 20px !important;
+    width: 100% !important;
+    height: auto !important;
+    overflow-y: visible !important;
+  }
+  
+  .top-nav {
+    flex-direction: column !important;
+    gap: 15px !important;
+    text-align: center !important;
+  }
+  
+  .view-title { font-size: 20px !important; }
+  
+  .calendar-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
+  <script type="module" crossorigin src="/phantom-studio-command/assets/index-BO0_P2R2.js"></script>
+</head>
+<body>
+  <div id="app">
+    <aside id="sidebar" class="sidebar">
+      <div class="logo">
+        <h2>PHANTOM</h2>
+        <span class="subtitle">STUDIO COMMAND</span>
+      </div>
+      <nav>
+        <button class="nav-btn active" id="btn-calendar">📅 Calendario</button>
+        <button class="nav-btn" id="btn-music">🎵 Música & Letras</button>
+        <button class="nav-btn" id="btn-recommendations">🎧 Recomendaciones</button>
+        <button class="nav-btn" id="btn-videos">🎬 Historial Videos</button>
+        <button class="nav-btn" id="btn-growth">📈 Growth Tracker</button>
+        <button class="nav-btn" id="btn-stats">📊 Estadísticas</button>
+        <button class="nav-btn" id="btn-editor">📝 Editor de Posts</button>
+        <button class="nav-btn" id="btn-members">👥 Equipo</button>
+        <button class="nav-btn" id="btn-ideas">💡 Ideas</button>
+        <button class="nav-btn" id="btn-releases">🚀 Releases</button>
+        <button class="nav-btn" id="btn-brandkit">🎨 Brand Kit</button>
+      </nav>
+      
+      <div class="sidebar-section">
+        <h4>Meta Principal</h4>
+        <div class="growth-widget">
+          <div class="progress-bar" style="background:rgba(255,255,255,0.05); height:8px; border-radius:4px; overflow:hidden;">
+            <div class="progress-fill" id="global-progress" style="width: 0%; height:100%; background:var(--accent-cyan);"></div>
+          </div>
+          <div class="progress-text" style="font-size:11px; margin-top:5px;"><span id="global-followers">0</span> / 10,000</div>
+        </div>
+      </div>
+    </aside>
+
+    <main class="main-content">
+      <!-- CALENDAR VIEW -->
+      <section id="calendar-view" class="view-section active">
+        <header class="top-nav">
+          <button class="week-nav" id="prev-week">← Anterior</button>
+          <h1 id="week-title" class="view-title">Semana Actual</h1>
+          <button class="week-nav" id="next-week">Siguiente →</button>
+        </header>
+        <div id="calendar-grid" class="calendar-grid"></div>
+      </section>
+
+      <!-- MUSIC VIEW (NEW) -->
+      <section id="music-view" class="view-section">
+        <h1 class="view-title">🎵 Canciones, Releases & Letras</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Administra el catálogo oficial de Phantom Studio.</p>
+        <div class="music-container" style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 32px; min-height: 500px;">
+          <!-- Left: Song List -->
+          <div class="song-list-panel" style="background: var(--bg-panel); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; display: flex; flex-direction: column; gap: 16px;">
+            <h3>Catálogo Oficial</h3>
+            <div id="song-list" style="display: flex; flex-direction: column; gap: 12px; max-height: 450px; overflow-y: auto; padding-right: 8px;">
+              <!-- Dynamic content -->
+            </div>
+          </div>
+          <!-- Right: Song Details & Lyrics -->
+          <div class="lyrics-panel" style="background: var(--glass-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px; backdrop-filter: blur(10px);">
+            <div id="lyrics-detail-empty" style="text-align: center; margin: auto; color: var(--text-secondary);">
+              <span style="font-size: 48px;">🎵</span>
+              <p style="margin-top: 16px;">Selecciona una canción del catálogo para ver su estructura y letra.</p>
+            </div>
+            <div id="lyrics-detail-content" class="hidden" style="display: flex; flex-direction: column; gap: 16px;">
+              <h2 id="song-detail-title" style="color: var(--accent-cyan);">Título de Canción</h2>
+              <p id="song-detail-meta" style="font-family: var(--font-mono); font-size: 13px; color: var(--text-secondary);">Artista | Género</p>
+              
+              <!-- Mock player -->
+              <div class="player-mock" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); padding: 16px; border-radius: 12px; display: flex; align-items: center; gap: 16px;">
+                <button id="btn-play-mock" style="background: var(--accent-cyan); border: none; color: var(--bg-color); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; font-weight: bold; font-size: 18px; display: flex; align-items: center; justify-content: center;">▶</button>
+                <div style="flex: 1;">
+                  <div style="font-size: 12px; font-family: var(--font-mono); display: flex; justify-content: space-between; margin-bottom: 6px;">
+                    <span>Escuchar Demo</span>
+                    <span id="player-time">0:00 / 1:00</span>
+                  </div>
+                  <div style="height: 20px; display: flex; align-items: flex-end; gap: 2px;" id="waveform-mock">
+                    <!-- Bars populated by JS -->
+                  </div>
+                </div>
+              </div>
+
+              <h3>Letra / Estructura</h3>
+              <div id="song-detail-lyrics" class="script-box" style="margin-top: 0; min-height: 200px;"></div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- RECOMMENDATIONS VIEW -->
+      <section id="recommendations-view" class="view-section">
+        <h1 class="view-title">🎧 Recomendaciones Musicales & Referencias</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Catálogo de inspiración, técnicas de producción y referencias clave para el roster.</p>
+        
+        <!-- Register Recommendation Form -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; margin-bottom: 32px;">
+          <h3>Registrar Recomendación Musical</h3>
+          <form id="add-rec-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-top: 16px;">
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Título de Canción</label>
+              <input type="text" id="r-title" placeholder="Ej: Losing It" required style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Artista</label>
+              <input type="text" id="r-artist" placeholder="Ej: FISHER" required style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Género</label>
+              <select id="r-genre" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                <option value="Tech House">Tech House</option>
+                <option value="Bass House">Bass House</option>
+                <option value="Afrohouse">Afrohouse</option>
+                <option value="Trap">Trap</option>
+                <option value="Otro">Otro / Híbrido</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Recomendado por</label>
+              <select id="r-by" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                <option value="Chino Valderrama">Chino Valderrama</option>
+                <option value="Tilin">Tilin</option>
+                <option value="Codex (Ian)">Codex (Ian)</option>
+                <option value="Ridd (Mau)">Ridd (Mau)</option>
+                <option value="Vytruz (Allan)">Vytruz (Allan)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Calificación</label>
+              <select id="r-rating" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                <option value="5">⭐⭐⭐⭐⭐ (Imprescindible)</option>
+                <option value="4">⭐⭐⭐⭐ (Muy Buena)</option>
+                <option value="3">⭐⭐⭐ (Buena)</option>
+                <option value="2">⭐⭐ (Regular)</option>
+                <option value="1">⭐ (Interesante)</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Enlace (Spotify/YouTube/etc)</label>
+              <input type="url" id="r-link" placeholder="https://..." required style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+            </div>
+            <div style="grid-column: 1 / -1;">
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Puntos de Enfoque / Producción (¿Por qué la recomiendas?)</label>
+              <textarea id="r-focus" placeholder="Describe los elementos interesantes: bajo, diseño de sonido, vocales, transiciones..." required style="width: 100%; height: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px; font-family: var(--font-main); resize: vertical;"></textarea>
+            </div>
+            <div style="grid-column: 1 / -1; display: flex; justify-content: flex-end;">
+              <button type="submit" style="background: var(--accent-cyan); color: var(--bg-color); border: none; padding: 12px 24px; border-radius: 8px; font-weight: bold; cursor: pointer; transition: all 0.3s ease;">Añadir Recomendación</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Filter buttons -->
+        <div class="rec-filters" style="display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
+          <button class="nav-btn active filter-rec-btn" data-filter="all" style="padding: 8px 16px; font-size: 13px;">Todos</button>
+          <button class="nav-btn filter-rec-btn" data-filter="Tech House" style="padding: 8px 16px; font-size: 13px;">🎹 Tech House</button>
+          <button class="nav-btn filter-rec-btn" data-filter="Bass House" style="padding: 8px 16px; font-size: 13px;">🔊 Bass House</button>
+          <button class="nav-btn filter-rec-btn" data-filter="Afrohouse" style="padding: 8px 16px; font-size: 13px;">🥁 Afrohouse</button>
+          <button class="nav-btn filter-rec-btn" data-filter="Trap" style="padding: 8px 16px; font-size: 13px;">🔥 Trap</button>
+          <button class="nav-btn filter-rec-btn" data-filter="Otro" style="padding: 8px 16px; font-size: 13px;">🎵 Otros</button>
+        </div>
+
+        <!-- List/Grid of Recommendations -->
+        <div id="recommendations-grid" class="calendar-grid">
+          <!-- Dynamic recommendation cards -->
+        </div>
+      </section>
+
+      <!-- VIDEOS VIEW (NEW) -->
+      <section id="videos-view" class="view-section">
+        <h1 class="view-title">🎬 Historial de Videos y TikToks</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Controla la producción de contenido y tiktoks grabados.</p>
+        
+        <!-- Register Video Form -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; margin-bottom: 32px;">
+          <h3>Registrar Video Grabado</h3>
+          <form id="add-video-form" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)) 120px; gap: 16px; margin-top: 16px; align-items: flex-end;">
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Título del Video</label>
+              <input type="text" id="v-title" placeholder="Ej: Grabando solo de sax" required style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Artista</label>
+              <select id="v-artist" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                <option value="Chino Valderrama">Chino Valderrama</option>
+                <option value="Codex (Ian)">Codex (Ian)</option>
+                <option value="Ridd (Mau)">Ridd (Mau)</option>
+                <option value="Vytruz (Allan)">Vytruz (Allan)</option>
+                <option value="Tilin">Tilin</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Plataforma</label>
+              <select id="v-platform" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                <option value="TikTok">TikTok</option>
+                <option value="Instagram">Instagram</option>
+                <option value="YouTube">YouTube</option>
+              </select>
+            </div>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Estado</label>
+              <select id="v-status" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                <option value="Idea">Idea</option>
+                <option value="Grabado">Grabado</option>
+                <option value="En Edición">En Edición</option>
+                <option value="Publicado">Publicado</option>
+              </select>
+            </div>
+            <button type="submit" style="background: var(--accent-cyan); color: var(--bg-color); border: none; padding: 12px; border-radius: 8px; font-weight: bold; cursor: pointer;">Guardar</button>
+          </form>
+        </div>
+
+        <!-- Filter buttons -->
+        <div class="video-filters" style="display: flex; gap: 10px; margin-bottom: 24px; overflow-x: auto; padding-bottom: 8px;">
+          <button class="nav-btn active filter-btn" data-filter="all" style="padding: 8px 16px; font-size: 13px;">Todos</button>
+          <button class="nav-btn filter-btn" data-filter="Idea" style="padding: 8px 16px; font-size: 13px;">💡 Ideas</button>
+          <button class="nav-btn filter-btn" data-filter="Grabado" style="padding: 8px 16px; font-size: 13px;">🎥 Grabados</button>
+          <button class="nav-btn filter-btn" data-filter="En Edición" style="padding: 8px 16px; font-size: 13px;">✂️ En Edición</button>
+          <button class="nav-btn filter-btn" data-filter="Publicado" style="padding: 8px 16px; font-size: 13px;">🚀 Publicados</button>
+        </div>
+
+        <!-- List/Grid of Videos -->
+        <div id="video-grid" class="calendar-grid">
+          <!-- Dynamic video cards -->
+        </div>
+      </section>
+
+      <!-- GROWTH TRACKER VIEW -->
+      <section id="growth-view" class="view-section">
+        <h1 class="view-title">Growth Tracker</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Registra y monitorea el crecimiento de tus redes principales.</p>
+        <div id="account-list" class="account-list"></div>
+        <button class="btn-add-account" id="btn-add-account">+ Añadir Cuenta</button>
+      </section>
+
+      <!-- STATS VIEW (NEW) -->
+      <section id="stats-view" class="view-section">
+        <h1 class="view-title">📊 Estadísticas e Impacto Social</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Análisis de datos, vistas y engagement de todo el roster.</p>
+        
+        <!-- Global Stats Cards -->
+        <div class="calendar-grid" style="margin-bottom: 32px;">
+          <div class="day-card" style="cursor: default;">
+            <div class="day-header"><span class="day-name" style="color: var(--accent-cyan);">TikTok Views</span></div>
+            <div style="font-size: 32px; font-weight: 800; margin: 12px 0;" id="stat-total-views">0</div>
+            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);">Suma del roster completo</div>
+          </div>
+          <div class="day-card" style="cursor: default;">
+            <div class="day-header"><span class="day-name" style="color: var(--accent-magenta);">Spotify Streams</span></div>
+            <div style="font-size: 32px; font-weight: 800; margin: 12px 0;" id="stat-total-streams">0</div>
+            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);">Tracks oficiales de Phantom</div>
+          </div>
+          <div class="day-card" style="cursor: default;">
+            <div class="day-header"><span class="day-name" style="color: var(--accent-amber);">Seguidores Totales</span></div>
+            <div style="font-size: 32px; font-weight: 800; margin: 12px 0;" id="stat-total-followers">0</div>
+            <div style="font-size: 11px; font-family: var(--font-mono); color: var(--text-secondary);">Cuentas trackeadas en total</div>
+          </div>
+        </div>
+
+        <!-- Artists Table -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; overflow-x: auto;">
+          <h3>Métricas por Artista</h3>
+          <table style="width: 100%; border-collapse: collapse; margin-top: 16px; text-align: left;">
+            <thead>
+              <tr style="border-bottom: 1px solid var(--border-color); color: var(--accent-cyan); font-family: var(--font-mono); font-size: 13px;">
+                <th style="padding: 12px;">Artista</th>
+                <th style="padding: 12px;">Seguidores</th>
+                <th style="padding: 12px;">Oyentes Spotify</th>
+                <th style="padding: 12px;">Engagement</th>
+                <th style="padding: 12px;">Growth Rate</th>
+              </tr>
+            </thead>
+            <tbody id="stats-artists-rows" style="font-size: 14px;">
+              <!-- Dynamic rows -->
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- EDITOR VIEW (NEW) -->
+      <section id="editor-view" class="view-section">
+        <h1 class="view-title">📝 Editor de Posts & Guiones</h1>
+        <p style="color: var(--text-secondary); margin-bottom: 24px;">Desarrolla, pule y formatea tu contenido antes de grabarlo.</p>
+        
+        <div class="editor-container" style="display: grid; grid-template-columns: 1.2fr 1fr; gap: 32px; min-height: 500px;">
+          <!-- Left Panel: Text Inputs -->
+          <div style="background: var(--bg-panel); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px;">
+            <h3>Editor</h3>
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Hook Principal (Llamativo)</label>
+              <input type="text" id="editor-hook" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; font-family: var(--font-main);" placeholder="Escribe el hook que captará la atención...">
+            </div>
+            
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Formato</label>
+                <select id="editor-format" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;">
+                  <option value="Short">Short (15-30s)</option>
+                  <option value="Long">Long Form (1-3 min)</option>
+                  <option value="Carousel">Carousel / Fotos</option>
+                </select>
+              </div>
+              <div>
+                <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Efecto Recomendado</label>
+                <input type="text" id="editor-effect" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px;" placeholder="Ej: Whip pan">
+              </div>
+            </div>
+
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Cuerpo del Guión / Desarrollo</label>
+              <textarea id="editor-body" style="width: 100%; height: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 12px; border-radius: 8px; font-family: var(--font-mono); resize: vertical;" placeholder="1. Gancho\n2. Contexto...\n3. Resultado final..."></textarea>
+            </div>
+            
+            <div>
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 6px;">Hashtags</label>
+              <input type="text" id="editor-hashtags" style="width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-color); color: white; padding: 10px; border-radius: 8px; font-family: var(--font-mono);" placeholder="(opcional) — en IG mejor sin hashtags en el cuerpo">
+            </div>
+
+            <!-- Banco de textos -->
+            <div style="border-top: 1px solid var(--border-color); padding-top: 16px;">
+              <label style="font-size: 12px; color: var(--text-secondary); display: block; margin-bottom: 8px;">🏦 Banco de textos <span id="bank-count"></span></label>
+              <div style="display: flex; gap: 10px;">
+                <button id="btn-bank-pull" style="flex:1; background: var(--accent-2); color: #fff; border: none; padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">↺ Traer uno</button>
+                <button id="btn-bank-save" style="flex:1; background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 10px; border-radius: 8px; font-weight: 600; cursor: pointer;">⭐ Guardar cuerpo</button>
+              </div>
+              <p id="bank-hint" style="font-size: 11px; color: var(--text-secondary); margin-top: 8px; min-height: 14px;"></p>
+            </div>
+          </div>
+
+          <!-- Right Panel: Preview & Copy -->
+          <div style="background: var(--glass-bg); border: 1px solid var(--border-color); padding: 24px; border-radius: 16px; display: flex; flex-direction: column; gap: 20px; backdrop-filter: blur(10px);">
+            <h3>Vista Previa del Post</h3>
+            <div id="post-preview-box" class="script-box" style="flex: 1; margin-top: 0; min-height: 300px; white-space: pre-wrap; font-family: var(--font-mono);"></div>
+            <button id="btn-copy-post" style="background: var(--accent-cyan); color: var(--bg-color); border: none; padding: 16px; border-radius: 12px; font-weight: bold; cursor: pointer; font-size: 15px; display: flex; align-items: center; justify-content: center; gap: 10px; transition: all 0.3s ease;">
+              <span>📋 Copiar Post Formateado</span>
+            </button>
+          </div>
+        </div>
+      </section>
+
+      <!-- MEMBERS VIEW -->
+      <section id="members-view" class="view-section">
+        <h1 class="view-title">Estrategia por Artista</h1>
+        <div id="member-grid" class="member-grid"></div>
+      </section>
+
+      <!-- IDEAS VIEW -->
+      <section id="ideas-view" class="view-section">
+        <h1 class="view-title">Banco de Ideas</h1>
+        <div id="ideas-container"></div>
+        <button class="btn-refresh-ideas" id="btn-refresh-ideas" style="margin-top: 20px;">Generar Nuevas Ideas</button>
+      </section>
+
+      <!-- RELEASES VIEW -->
+      <section id="releases-view" class="view-section">
+        <h1 class="view-title">🚀 Release Pipeline</h1>
+        <div id="releases-container"></div>
+      </section>
+
+      <!-- BRAND KIT VIEW -->
+      <section id="brandkit-view" class="view-section">
+        <h1 class="view-title">🎨 Brand Kit</h1>
+        <div id="brandkit-container"></div>
+      </section>
+
+      <!-- MODAL -->
+      <div id="content-detail-modal" class="modal hidden">
+        <div class="modal-content">
+          <button class="close-btn" id="close-modal">×</button>
+          <div id="modal-body"></div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+</body>
+</html>
